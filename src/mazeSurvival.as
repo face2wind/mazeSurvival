@@ -3,6 +3,7 @@ package
 	import controller.MazeController;
 	
 	import face2wind.ASBaseLib;
+	import face2wind.ASUIComponent;
 	import face2wind.lib.Debuger;
 	
 	import flash.display.Sprite;
@@ -20,6 +21,7 @@ package
 		
 		private function onStart():void
 		{
+			ASUIComponent.initialize();
 			Debuger.setModuleDebug( Debuger.BASE_LIB, true);
 			
 			MazeController.getInstance();

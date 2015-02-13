@@ -2,6 +2,7 @@ package view
 {
 	import event.SceneEvent;
 	
+	import face2wind.customUIComponents.Message;
 	import face2wind.event.ParamEvent;
 	import face2wind.view.BaseSprite;
 	
@@ -10,6 +11,7 @@ package view
 	import flash.display.Graphics;
 	import flash.display.Shape;
 	import flash.events.Event;
+	import flash.geom.Point;
 	
 	import model.SceneManager;
 	
@@ -26,6 +28,8 @@ package view
 		
 		private var manager:SceneManager;
 		private var pathFinder:AStarPathFinder;
+		private var elementLayer:BaseSprite;
+		private var pathLayer:BaseSprite;
 		
 		public function Scene()
 		{
@@ -40,6 +44,10 @@ package view
 			super.createChildren();
 			meshShape = new Shape();
 			addChild(meshShape);
+			elementLayer = new BaseSprite();
+			addChild(elementLayer);
+			pathLayer = new BaseSprite();
+			addChild(pathLayer);
 			
 			manager = SceneManager.getInstance();
 			pathFinder = new AStarPathFinder();
@@ -66,18 +74,46 @@ package view
 			pathFinder.setMapData(mapData);
 			var g:Graphics = meshShape.graphics;
 			g.lineStyle(1,0xff00ff);
-			g.moveTo(0,0); // 画出地图边框
-			g.lineTo(0, MapItem.HEIGHT*(mapData[0].length-1));
-			g.lineTo(MapItem.WIDTH*(mapData.length-1), MapItem.HEIGHT*(mapData[0].length-1));
-			g.lineTo(MapItem.WIDTH*(mapData.length-1), 0);
-			g.lineTo(0, 0);
-			for (var i:int = 0; i < mapData.length; i++) {
+			for (var i:int = 0; i <= mapData[0].length; i++) {
 				g.moveTo(0, i*MapItem.HEIGHT);
-				g.lineTo(MapItem.WIDTH*(mapData.length-1),  i*MapItem.HEIGHT);
+				g.lineTo(MapItem.WIDTH*(mapData.length),  i*MapItem.HEIGHT);
 			}
-			for (var j:int = 0; j < mapData[0].length; j++) {
+			for (var j:int = 0; j <= mapData.length; j++) {
 				g.moveTo(j*MapItem.WIDTH, 0);
-				g.lineTo(j*MapItem.WIDTH, MapItem.HEIGHT*(mapData[0].length-1));
+				g.lineTo(j*MapItem.WIDTH, MapItem.HEIGHT*(mapData[0].length));
+			}
+			for (var k:int = 0; k < mapData.length; k++) {
+				for (var l:int = 0; l < mapData[0].length; l++){
+					var mapItem:MapItem = new MapItem();
+					mapItem.type = mapData[k][l];
+					mapItem.move(k*MapItem.WIDTH, l*MapItem.HEIGHT);
+					elementLayer.addChild(mapItem);
+				}
+			}
+			
+		}
+		
+		/**
+		 * 测试寻路并把路径画出来 
+		 */		
+		private function showFindPath():void
+		{
+			var path:Array = pathFinder.findPath(new Point(1,2), new Point(5,2));
+			if(null == path){
+				Message.show("没有找到合适路径");
+				return;
+			}
+			pathLayer.removeAllChildren();
+			for (var i:int = 0; i < path.length; i++) 
+			{
+				var p:Point = path[i];
+				var pathItem:Shape = new Shape();
+				pathItem.graphics.beginFill(0xff00ff,0.7);
+				pathItem.graphics.drawRect(1,1,MapItem.WIDTH, MapItem.HEIGHT);
+				pathItem.graphics.endFill();
+				pathItem.x = p.x*MapItem.WIDTH;
+				pathItem.y = p.y*MapItem.HEIGHT;
+				pathLayer.addChild(pathItem);
 			}
 		}
 		
@@ -85,6 +121,8 @@ package view
 		{
 			clearMaze();
 			initMaze();
+			
+			showFindPath();
 		}
 		
 		/**

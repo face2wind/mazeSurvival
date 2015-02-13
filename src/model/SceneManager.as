@@ -44,7 +44,7 @@ package model
 		/**
 		 * 场景宽度（格子数） 
 		 */		
-		private var _sceneWidth:int = 5;
+		private var _sceneWidth:int = 7;
 		/**
 		 * 场景高度（格子数） 
 		 */		
@@ -68,8 +68,11 @@ package model
 			for (var i:int = 0; i < _sceneWidth; i++) {
 				mapData[i] = [];
 				for (var j:int = 0; j < _sceneHeight; j++) 
-					mapData[i][j] = MapDataType.getRandomType();
+					mapData[i][j] = MapDataType.GROUND;//MapDataType.getRandomType();
 			}
+			mapData[3][1] = MapDataType.OBSTACLE;
+			mapData[3][2] = MapDataType.OBSTACLE;
+			mapData[3][3] = MapDataType.OBSTACLE;
 			dispatchEvent(new ParamEvent(SceneEvent.RESTART_DEMO));
 		}
 	}

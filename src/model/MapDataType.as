@@ -26,7 +26,7 @@ package model
 		 */		
 		public static function getRandomType():int
 		{
-			if(0.5 < Math.random())
+			if(0.8 > Math.random())
 				return GROUND;
 			else
 				return OBSTACLE;
