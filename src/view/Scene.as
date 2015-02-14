@@ -98,9 +98,13 @@ package view
 		 */		
 		private function showFindPath():void
 		{
-			var path:Array = pathFinder.findPath(new Point(1,2), new Point(5,2));
+			var mapData:Array = manager.getMapData();
+			var maxX:int = mapData.length-1;
+			var randomY1:int = Math.random()*mapData[0].length1;
+			var randomY2:int = Math.random()*mapData[0].length;
+			var path:Array = pathFinder.findPath(new Point(0,randomY1), new Point(maxX, randomY2));
 			if(null == path){
-				Message.show("没有找到合适路径");
+				Message.show("(0,"+randomY1+") -> ("+maxX+","+randomY2+")没有找到合适路径");
 				return;
 			}
 			pathLayer.removeAllChildren();
@@ -108,7 +112,7 @@ package view
 			{
 				var p:Point = path[i];
 				var pathItem:Shape = new Shape();
-				pathItem.graphics.beginFill(0xff00ff,0.7);
+				pathItem.graphics.beginFill(0xff00ff,0.5);
 				pathItem.graphics.drawRect(1,1,MapItem.WIDTH, MapItem.HEIGHT);
 				pathItem.graphics.endFill();
 				pathItem.x = p.x*MapItem.WIDTH;

@@ -44,11 +44,11 @@ package model
 		/**
 		 * 场景宽度（格子数） 
 		 */		
-		private var _sceneWidth:int = 7;
+		private var _sceneWidth:int = 25;
 		/**
 		 * 场景高度（格子数） 
 		 */		
-		private var _sceneHeight:int = 5;
+		private var _sceneHeight:int = 18;
 		
 		/**
 		 * 获取地图数据 
@@ -67,12 +67,16 @@ package model
 			mapData = [];
 			for (var i:int = 0; i < _sceneWidth; i++) {
 				mapData[i] = [];
-				for (var j:int = 0; j < _sceneHeight; j++) 
-					mapData[i][j] = MapDataType.GROUND;//MapDataType.getRandomType();
+				for (var j:int = 0; j < _sceneHeight; j++){ 
+					if(0 == i || _sceneWidth-1 == i) // 两边不要生成障碍
+						mapData[i][j] = MapDataType.GROUND;
+					else
+						mapData[i][j] = MapDataType.getRandomType();
+				}
 			}
-			mapData[3][1] = MapDataType.OBSTACLE;
-			mapData[3][2] = MapDataType.OBSTACLE;
-			mapData[3][3] = MapDataType.OBSTACLE;
+//			mapData[3][1] = MapDataType.OBSTACLE;
+//			mapData[3][2] = MapDataType.OBSTACLE;
+//			mapData[3][3] = MapDataType.OBSTACLE;
 			dispatchEvent(new ParamEvent(SceneEvent.RESTART_DEMO));
 		}
 	}

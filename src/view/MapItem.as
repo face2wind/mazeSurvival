@@ -13,11 +13,11 @@ package view
 		/**
 		 *  地图元素固定宽度
 		 */		
-		public static const WIDTH:int = 50;
+		public static const WIDTH:int = 20;
 		/**
 		 *  地图元素固定高度
 		 */		
-		public static const HEIGHT:int = 50;
+		public static const HEIGHT:int =20;
 
 		/**
 		 * 地图元素类型
