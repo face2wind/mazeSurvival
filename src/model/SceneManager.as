@@ -44,11 +44,11 @@ package model
 		/**
 		 * 场景宽度（格子数） 
 		 */		
-		private var _sceneWidth:int = 25;
+		private var _sceneWidth:int = 72;//25;
 		/**
 		 * 场景高度（格子数） 
 		 */		
-		private var _sceneHeight:int = 18;
+		private var _sceneHeight:int = 42;//18;
 		
 		/**
 		 * 获取地图数据 
@@ -74,9 +74,6 @@ package model
 						mapData[i][j] = MapDataType.getRandomType();
 				}
 			}
-//			mapData[3][1] = MapDataType.OBSTACLE;
-//			mapData[3][2] = MapDataType.OBSTACLE;
-//			mapData[3][3] = MapDataType.OBSTACLE;
 			dispatchEvent(new ParamEvent(SceneEvent.RESTART_DEMO));
 		}
 	}

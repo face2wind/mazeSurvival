@@ -1,8 +1,13 @@
 package controller
 {
+	import event.SceneEvent;
+	
 	import face2wind.base.Controller;
 	import face2wind.enum.LayerEnum;
+	import face2wind.event.ParamEvent;
+	import face2wind.manager.EnterFrameUtil;
 	import face2wind.manager.LayerManager;
+	import face2wind.manager.TimerManager;
 	
 	import model.SceneManager;
 	
@@ -25,6 +30,19 @@ package controller
 			_scene = new Scene();
 			LayerManager.getInstance().getLayer(LayerEnum.SCENE_LAYER).addChild(_scene);
 			
+			eventManager.bindToController(SceneEvent.PATH_SHOW_COMPLETE, onShowPathCompleteHandler);
+			
+			manager.reStartDemo();
+//			TimerManager.getInstance().addItem(2000, reflashDemoTimerHandler);
+		}
+		
+		private function onShowPathCompleteHandler(e:ParamEvent):void
+		{
+			EnterFrameUtil.delayCall(1000, reflashDemoTimerHandler);
+		}
+		
+		private function reflashDemoTimerHandler():void
+		{
 			manager.reStartDemo();
 		}
 		

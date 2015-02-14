@@ -79,7 +79,7 @@ package findPath
 				return;
 			for (var i:int = 0; i < openList.length; i++){
 				var curPoint:AStarPoint = openList[i];
-				if(curPoint.f < newPoint.f && curPoint.level >= newPoint.level)
+				if(curPoint.f <= newPoint.f && curPoint.level >= newPoint.level)
 					break;
 			}
 			openList.splice(i, 0 ,newPoint);

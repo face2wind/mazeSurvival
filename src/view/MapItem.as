@@ -56,7 +56,7 @@ package view
 				typeChange = false;
 				graphics.clear();
 				if(type == MapDataType.OBSTACLE){
-					graphics.beginFill(0x0fff00);
+					graphics.beginFill(0xa0a0a0);
 					graphics.drawRect(1,1, MapItem.WIDTH-1, MapItem.HEIGHT-1);
 					graphics.endFill();
 				}

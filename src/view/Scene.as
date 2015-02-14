@@ -4,6 +4,7 @@ package view
 	
 	import face2wind.customUIComponents.Message;
 	import face2wind.event.ParamEvent;
+	import face2wind.manager.TimerManager;
 	import face2wind.view.BaseSprite;
 	
 	import findPath.AStarPathFinder;
@@ -30,6 +31,11 @@ package view
 		private var pathFinder:AStarPathFinder;
 		private var elementLayer:BaseSprite;
 		private var pathLayer:BaseSprite;
+		
+		/**
+		 * 临时变量，寻好的待显示路径 
+		 */		
+		private var _tmpFindPathArr:Array;
 		
 		public function Scene()
 		{
@@ -72,7 +78,9 @@ package view
 				return;
 			
 			pathFinder.setMapData(mapData);
+			elementLayer.removeAllChildren();
 			var g:Graphics = meshShape.graphics;
+			g.clear();
 			g.lineStyle(1,0xff00ff);
 			for (var i:int = 0; i <= mapData[0].length; i++) {
 				g.moveTo(0, i*MapItem.HEIGHT);
@@ -93,6 +101,43 @@ package view
 			
 		}
 		
+		private function clearPath():void
+		{
+			pathLayer.removeAllChildren();
+		}
+		
+		/**
+		 * 测试寻路并把路径画出来 
+		 */		
+		private function showFindPathTimer():void
+		{
+			var mapData:Array = manager.getMapData();
+			var maxX:int = mapData.length-1;
+			var mapH:int = mapData[0].length;
+			var randomY1:int = (Math.random()+mapH/2)%mapH;
+			var randomY2:int = Math.random()*mapH;
+			_tmpFindPathArr = pathFinder.findPath(new Point(0,randomY1), new Point(maxX, randomY2));
+			if(null == _tmpFindPathArr){
+				Message.show("(0,"+randomY1+") -> ("+maxX+","+randomY2+")没有找到合适路径");
+				eventManager.dispatchToController(new ParamEvent(SceneEvent.PATH_SHOW_COMPLETE));
+				return;
+			}
+			drawPathPoint(new Point(0,randomY1));
+			drawPathPoint(new Point(maxX,randomY2));
+			TimerManager.getInstance().removeItem(showPathTimerHandler);
+			TimerManager.getInstance().addItem(50, showPathTimerHandler);
+		}
+		
+		private function showPathTimerHandler():void
+		{
+			if(null == _tmpFindPathArr || 0 == _tmpFindPathArr.length){
+				TimerManager.getInstance().removeItem(showPathTimerHandler);
+				eventManager.dispatchToController(new ParamEvent(SceneEvent.PATH_SHOW_COMPLETE));
+				return;
+			}
+			var p:Point = _tmpFindPathArr.shift();
+			drawPathPoint(p);
+		}
 		/**
 		 * 测试寻路并把路径画出来 
 		 */		
@@ -100,25 +145,37 @@ package view
 		{
 			var mapData:Array = manager.getMapData();
 			var maxX:int = mapData.length-1;
-			var randomY1:int = Math.random()*mapData[0].length1;
-			var randomY2:int = Math.random()*mapData[0].length;
+			var mapH:int = mapData[0].length;
+			var randomY1:int = (Math.random()+mapH/2)%mapH;
+			var randomY2:int = Math.random()*mapH;
 			var path:Array = pathFinder.findPath(new Point(0,randomY1), new Point(maxX, randomY2));
 			if(null == path){
 				Message.show("(0,"+randomY1+") -> ("+maxX+","+randomY2+")没有找到合适路径");
+				eventManager.dispatchToController(new ParamEvent(SceneEvent.PATH_SHOW_COMPLETE));
 				return;
 			}
-			pathLayer.removeAllChildren();
+			drawPathPoint(new Point(0,randomY1));
+			drawPathPoint(new Point(maxX,randomY2));
 			for (var i:int = 0; i < path.length; i++) 
 			{
 				var p:Point = path[i];
-				var pathItem:Shape = new Shape();
-				pathItem.graphics.beginFill(0xff00ff,0.5);
-				pathItem.graphics.drawRect(1,1,MapItem.WIDTH, MapItem.HEIGHT);
-				pathItem.graphics.endFill();
-				pathItem.x = p.x*MapItem.WIDTH;
-				pathItem.y = p.y*MapItem.HEIGHT;
-				pathLayer.addChild(pathItem);
+				drawPathPoint(p);
 			}
+		}
+		
+		/**
+		 * 画出路径点（在路径层里） 
+		 * @param p
+		 */		
+		private function drawPathPoint(p:Point):void
+		{
+			var pathItem:Shape = new Shape();
+			pathItem.graphics.beginFill(0xff00ff,0.5);
+			pathItem.graphics.drawRect(1,1,MapItem.WIDTH, MapItem.HEIGHT);
+			pathItem.graphics.endFill();
+			pathItem.x = p.x*MapItem.WIDTH;
+			pathItem.y = p.y*MapItem.HEIGHT;
+			pathLayer.addChild(pathItem);
 		}
 		
 		protected function onRestartDemoHandler(event:ParamEvent):void
@@ -126,7 +183,9 @@ package view
 			clearMaze();
 			initMaze();
 			
-			showFindPath();
+//			showFindPath();
+			clearPath();
+			showFindPathTimer();
 		}
 		
 		/**

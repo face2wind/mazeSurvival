@@ -11,5 +11,7 @@ package event
 		}
 		
 		public static const RESTART_DEMO:String = "RESTART_DEMO";
+		
+		public static const PATH_SHOW_COMPLETE:String = "PATH_SHOW_COMPLETE";
 	}
 }
