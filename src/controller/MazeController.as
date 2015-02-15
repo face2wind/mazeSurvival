@@ -10,6 +10,7 @@ package controller
 	import face2wind.manager.TimerManager;
 	
 	import model.SceneManager;
+	import model.vo.PlayerVo;
 	
 	import view.Scene;
 	
@@ -32,8 +33,16 @@ package controller
 			
 			eventManager.bindToController(SceneEvent.PATH_SHOW_COMPLETE, onShowPathCompleteHandler);
 			
-			manager.reStartDemo();
-//			TimerManager.getInstance().addItem(2000, reflashDemoTimerHandler);
+			startingSurvival();
+//			manager.reStartDemo();
+		}
+		
+		private function startingSurvival():void
+		{
+			manager.initMaze();
+			
+			var pvo:PlayerVo = new PlayerVo();
+			manager.addPlayer(pvo);
 		}
 		
 		private function onShowPathCompleteHandler(e:ParamEvent):void

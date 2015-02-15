@@ -21,6 +21,11 @@ package model
 		public static const OBSTACLE:int = 1;
 		
 		/**
+		 * 可探索的（属于可行走区域，在地图探索AI里用到）
+		 */		
+		public static const CAN_EXPLORE:int = 2;
+		
+		/**
 		 * 获取一个随机地图元素类型 
 		 * @return 
 		 */		
