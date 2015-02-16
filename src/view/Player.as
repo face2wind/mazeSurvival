@@ -15,6 +15,7 @@ package view
 		public function Player()
 		{
 			super();
+			_speed = 2;
 		}
 		
 		/**

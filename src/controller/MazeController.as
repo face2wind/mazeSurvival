@@ -10,6 +10,7 @@ package controller
 	import face2wind.manager.TimerManager;
 	
 	import model.SceneManager;
+	import model.vo.MonsterVo;
 	import model.vo.PlayerVo;
 	
 	import view.Scene;
@@ -42,7 +43,11 @@ package controller
 			manager.initMaze();
 			
 			var pvo:PlayerVo = new PlayerVo();
+			pvo.rebuildMindMap();
 			manager.addPlayer(pvo);
+			var mvo:MonsterVo = new MonsterVo();
+			mvo.rebuildMindMap();
+			manager.addMonster(mvo);
 		}
 		
 		private function onShowPathCompleteHandler(e:ParamEvent):void

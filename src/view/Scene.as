@@ -214,8 +214,11 @@ package view
 		
 		private function onCreateMonsterHandler(e:ParamEvent):void
 		{
-			// TODO Auto Generated method stub
-			
+			var monster:Monster = new Monster();
+			monster.monsterVo = e.param as MonsterVo;
+			monster.move(manager.exitPoint.x*MapItem.WIDTH,manager.exitPoint.y*MapItem.HEIGHT);
+			liveLayer.addChild(monster);
+			monsterDic[monster.monsterVo.id] = monster;
 		}
 		
 		private function onRebuildSceneHandler(e:ParamEvent):void

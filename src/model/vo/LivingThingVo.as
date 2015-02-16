@@ -4,7 +4,9 @@ package model.vo
 	
 	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
+	import flash.geom.Point;
 	
+	import model.MapDataType;
 	import model.MovingDirection;
 	import model.SceneManager;
 	
@@ -19,6 +21,26 @@ package model.vo
 			_id = curMaxID;
 			++ curMaxID;
 		}
+		
+		/**
+		 * 重新构建初始地图，宽高获取场景宽高，地图所有地方重置为不可走 
+		 */		
+		public function rebuildMindMap():void
+		{
+			var size:Point = SceneManager.getInstance().getSceneSize();
+			_mindMapData = [];
+			for (var i:int = 0; i < size.x; i++) {
+				_mindMapData.push([]);
+				for (var j:int = 0; j < size.y; j++) 
+					_mindMapData[i].push(MapDataType.OBSTACLE);
+			}
+		}
+		
+		/**
+		 * 这只生物脑海里的地图全貌，默认是全部不可走，通过探索慢慢接近真实地图 
+		 */		
+		protected var _mindMapData:Array;
+		
 		/**
 		 * X坐标（格子）
 		 */
@@ -112,15 +134,8 @@ package model.vo
 			
 			var _oldValue:* = _movingDir;
 			_movingDir = value;
-			if(MovingDirection.STOP == _oldValue || MovingDirection.STOP == _movingDir)
-				preDir = _oldValue;
 			dispatchEvent(PropertyChangeEvent.createUpdateEvent("movingDir", _oldValue, _movingDir));
 		}
-		
-		/**
-		 * 前一个方向 
-		 */		
-		public var preDir:int = -1;
 		
 		private static var curMaxID:int = 1;
 		/**

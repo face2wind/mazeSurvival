@@ -47,6 +47,15 @@ package model
 		}
 		
 		/**
+		 * 获取场景宽高（格子数） 
+		 * @return 
+		 */		
+		public function getSceneSize():Point
+		{
+			return new Point(_sceneWidth,_sceneHeight);
+		}
+		
+		/**
 		 * 地图数据 
 		 */		
 		private var mapData:Array;
