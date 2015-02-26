@@ -64,10 +64,14 @@ package view
 			var targetX:Number = livingVo.x;
 			var targetY:Number = livingVo.y;
 			switch(livingVo.movingDir){
-				case MovingDirection.UP:targetY--;break;
-				case MovingDirection.DOWN:targetY++;break;
+				case MovingDirection.TOP:targetY--;break;
+				case MovingDirection.BOTTOM:targetY++;break;
 				case MovingDirection.LEFT:targetX--;break;
 				case MovingDirection.RIGHT:targetX++;break;
+				case MovingDirection.TOP_LEFT:targetX--;targetY--;break;
+				case MovingDirection.TOP_RIGHT:targetX++;targetY--;break;
+				case MovingDirection.BOTTOM_LEFT:targetX--;targetY++;break;
+				case MovingDirection.BOTTOM_RIGHT:targetX++;targetY++;break;
 			}
 			var time:Number = Math.sqrt( (targetX-livingVo.x)*(targetX-livingVo.x) + (targetY-livingVo.y)*(targetY-livingVo.y)) / _speed;
 			TweenLite.to(this, time, {x:targetX*MapItem.WIDTH, y:targetY*MapItem.HEIGHT,onComplete:movingStepComplete, ease:Linear.easeNone});

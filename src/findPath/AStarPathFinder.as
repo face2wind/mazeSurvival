@@ -17,8 +17,26 @@ package findPath
 		public function AStarPathFinder()
 		{
 		}
-		public static const CAN_MOVING_AREA:int = 0;
+		/**
+		 * 可移动区域 
+		 */		
 		public static const CAN_NOT_MOVING_AREA:int = 1;
+		/**
+		 * 是否可移动区域 （0为可移动区域）
+		 * @param type
+		 * @return 
+		 */		
+		public static function canMovingArea(type:int):Boolean{
+			return (CAN_NOT_MOVING_AREA != type);
+		}
+		/**
+		 * 是否不可移动区域 （非0为不可移动区域）
+		 * @param type
+		 * @return 
+		 */		
+		public static function canNotMovingArea(type:int):Boolean{
+			return (CAN_NOT_MOVING_AREA == type);
+		}
 		/**
 		 * 地图数据 
 		 */		
@@ -96,34 +114,34 @@ package findPath
 			var width:int = _mapData.length-1;
 			var height:int = _mapData[0].length-1;
 			
-			if(0 < curPoint.x  && CAN_MOVING_AREA == _mapData[curPoint.x-1][curPoint.y].mapType) // 左
+			if(0 < curPoint.x  && canMovingArea(_mapData[curPoint.x-1][curPoint.y].mapType) ) // 左
 					surroundArr.push(_mapData[curPoint.x-1][curPoint.y]);
-			if(width > curPoint.x && CAN_MOVING_AREA == _mapData[curPoint.x+1][curPoint.y].mapType ) // 右
+			if(width > curPoint.x && canMovingArea(_mapData[curPoint.x+1][curPoint.y].mapType) ) // 右
 				surroundArr.push(_mapData[curPoint.x+1][curPoint.y]);
-			if(0 < curPoint.y && CAN_MOVING_AREA == _mapData[curPoint.x][curPoint.y-1].mapType ) // 上
+			if(0 < curPoint.y && canMovingArea(_mapData[curPoint.x][curPoint.y-1].mapType) ) // 上
 				surroundArr.push(_mapData[curPoint.x][curPoint.y-1]);
-			if(height > curPoint.y && CAN_MOVING_AREA == _mapData[curPoint.x][curPoint.y+1].mapType ) // 下
+			if(height > curPoint.y && canMovingArea(_mapData[curPoint.x][curPoint.y+1].mapType) ) // 下
 				surroundArr.push(_mapData[curPoint.x][curPoint.y+1]);
 			
 			if( 0 < curPoint.x && 0 < curPoint.y &&
-				CAN_MOVING_AREA == _mapData[curPoint.x-1][curPoint.y-1].mapType && // 左上
-				!(CAN_NOT_MOVING_AREA == _mapData[curPoint.x-1][curPoint.y].mapType&&
-				CAN_NOT_MOVING_AREA == _mapData[curPoint.x][curPoint.y-1].mapType) ) // 没有被两边夹住
+				canMovingArea(_mapData[curPoint.x-1][curPoint.y-1].mapType) && // 左上
+				!(canNotMovingArea(_mapData[curPoint.x-1][curPoint.y].mapType)&&
+					canNotMovingArea(_mapData[curPoint.x][curPoint.y-1].mapType) ) ) // 没有被两边夹住
 				surroundArr.push(_mapData[curPoint.x-1][curPoint.y-1]);
 			if(width > curPoint.x && 0 < curPoint.y &&
-				CAN_MOVING_AREA == _mapData[curPoint.x+1][curPoint.y-1].mapType && // 右上
-				!(CAN_NOT_MOVING_AREA == _mapData[curPoint.x][curPoint.y-1].mapType &&
-					CAN_NOT_MOVING_AREA == _mapData[curPoint.x+1][curPoint.y].mapType) ) // 没有被两边夹住
+				canMovingArea(_mapData[curPoint.x+1][curPoint.y-1].mapType) && // 右上
+				!(canNotMovingArea(_mapData[curPoint.x][curPoint.y-1].mapType) &&
+					canNotMovingArea(_mapData[curPoint.x+1][curPoint.y].mapType) ) ) // 没有被两边夹住
 				surroundArr.push(_mapData[curPoint.x+1][curPoint.y-1]);
 			if(width > curPoint.x && height > curPoint.y &&
-				CAN_MOVING_AREA == _mapData[curPoint.x+1][curPoint.y+1].mapType && // 右下
-				!(CAN_NOT_MOVING_AREA == _mapData[curPoint.x][curPoint.y+1].mapType &&
-				CAN_NOT_MOVING_AREA == _mapData[curPoint.x+1][curPoint.y].mapType) ) // 没有被两边夹住
+				canMovingArea(_mapData[curPoint.x+1][curPoint.y+1].mapType) && // 右下
+				!(canNotMovingArea(_mapData[curPoint.x][curPoint.y+1].mapType) &&
+					canNotMovingArea(_mapData[curPoint.x+1][curPoint.y].mapType) ) ) // 没有被两边夹住
 				surroundArr.push(_mapData[curPoint.x+1][curPoint.y+1]);
 			if(0 < curPoint.x && height > curPoint.y &&
-				CAN_MOVING_AREA == _mapData[curPoint.x-1][curPoint.y+1].mapType && // 左下
-				!(CAN_NOT_MOVING_AREA == _mapData[curPoint.x][curPoint.y+1].mapType &&
-				CAN_NOT_MOVING_AREA == _mapData[curPoint.x-1][curPoint.y].mapType) ) // 没有被两边夹住
+				canMovingArea(_mapData[curPoint.x-1][curPoint.y+1].mapType) && // 左下
+				!(canNotMovingArea(_mapData[curPoint.x][curPoint.y+1].mapType) &&
+					canNotMovingArea(_mapData[curPoint.x-1][curPoint.y].mapType)) ) // 没有被两边夹住
 				surroundArr.push(_mapData[curPoint.x-1][curPoint.y+1]);
 			return surroundArr;
 		}
@@ -189,6 +207,7 @@ package findPath
 				realPath.push(new Point(path[i].x, path[i].y));
 				msg += ("("+path[i].x+","+path[i].y+") -> ");
 			}
+//			trace(msg);
 			return realPath;
 		}
 		

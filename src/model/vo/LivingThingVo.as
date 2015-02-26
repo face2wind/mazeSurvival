@@ -150,6 +150,34 @@ package model.vo
 			return _id;
 		}
 		
+		/**
+		 * 把当前运动方向设置为当前点跟指定点构成的方向
+		 * @param nextPoint
+		 */		
+		protected function setDirection(nextPoint:Point):void
+		{
+			if(x < nextPoint.x && y < nextPoint.y)
+				movingDir = MovingDirection.TOP_LEFT;
+			if(x < nextPoint.x && y == nextPoint.y)
+				movingDir = MovingDirection.LEFT;
+			if(x < nextPoint.x && y > nextPoint.y)
+				movingDir = MovingDirection.BOTTOM_LEFT;
+			
+			if(x > nextPoint.x && y < nextPoint.y)
+				movingDir = MovingDirection.TOP_RIGHT;
+			if(x > nextPoint.x && y == nextPoint.y)
+				movingDir = MovingDirection.RIGHT;
+			if(x > nextPoint.x && y > nextPoint.y)
+				movingDir = MovingDirection.BOTTOM_RIGHT;
+			
+			if(x == nextPoint.x && y < nextPoint.y)
+				movingDir = MovingDirection.BOTTOM;
+			if(x == nextPoint.x && y == nextPoint.y)
+				movingDir = MovingDirection.STOP;
+			if(x == nextPoint.x && y > nextPoint.y)
+				movingDir = MovingDirection.TOP;
+		}
+		
 		protected var sManager:SceneManager = SceneManager.getInstance();
 		
 		/**
