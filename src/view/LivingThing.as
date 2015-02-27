@@ -57,10 +57,10 @@ package view
 		{
 			if(movingLocked)
 				return;
-			movingLocked = true;
-			
 			if(MovingDirection.STOP == livingVo.movingDir)
 				return;
+			movingLocked = true;
+			
 			var targetX:Number = livingVo.x;
 			var targetY:Number = livingVo.y;
 			switch(livingVo.movingDir){

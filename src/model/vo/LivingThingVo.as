@@ -1,5 +1,6 @@
 package model.vo
 {
+	import face2wind.customUIComponents.Message;
 	import face2wind.event.PropertyChangeEvent;
 	
 	import flash.events.EventDispatcher;
@@ -157,18 +158,18 @@ package model.vo
 		protected function setDirection(nextPoint:Point):void
 		{
 			if(x < nextPoint.x && y < nextPoint.y)
-				movingDir = MovingDirection.TOP_LEFT;
+				movingDir = MovingDirection.BOTTOM_RIGHT;
 			if(x < nextPoint.x && y == nextPoint.y)
-				movingDir = MovingDirection.LEFT;
+				movingDir = MovingDirection.RIGHT;
 			if(x < nextPoint.x && y > nextPoint.y)
-				movingDir = MovingDirection.BOTTOM_LEFT;
+				movingDir = MovingDirection.TOP_RIGHT;
 			
 			if(x > nextPoint.x && y < nextPoint.y)
-				movingDir = MovingDirection.TOP_RIGHT;
+				movingDir = MovingDirection.BOTTOM_LEFT;
 			if(x > nextPoint.x && y == nextPoint.y)
-				movingDir = MovingDirection.RIGHT;
+				movingDir = MovingDirection.LEFT;
 			if(x > nextPoint.x && y > nextPoint.y)
-				movingDir = MovingDirection.BOTTOM_RIGHT;
+				movingDir = MovingDirection.TOP_LEFT;
 			
 			if(x == nextPoint.x && y < nextPoint.y)
 				movingDir = MovingDirection.BOTTOM;

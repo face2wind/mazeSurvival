@@ -8,7 +8,7 @@ package
 	
 	import flash.display.Sprite;
 	
-	[SWF(width = "1000", height = "600", frameRate = "60", backgroundColor = "0xffffff")]
+	[SWF(width = "590", height = "400", frameRate = "60", backgroundColor = "0xffffff")]
 	/**
 	 * 
 	 * @author face2wind

@@ -62,11 +62,11 @@ package model
 		/**
 		 * 场景宽度（格子数） 
 		 */		
-		private var _sceneWidth:int = 72;//25;
+		private var _sceneWidth:int = 25;//72;
 		/**
 		 * 场景高度（格子数） 
 		 */		
-		private var _sceneHeight:int = 42;//18;
+		private var _sceneHeight:int = 18;//42;
 		/**
 		 * 玩家字典（逃生者） 
 		 */		 
@@ -109,6 +109,12 @@ package model
 		{
 			playerVoDic[playerVo.id] = playerVo;
 			dispatchEvent(new ParamEvent(SceneEvent.CREATE_PLAYER, playerVo));
+		}
+		
+		public function removePlayer(playerVo:PlayerVo):void
+		{
+			delete playerVoDic[playerVo.id];
+			dispatchEvent(new ParamEvent(SceneEvent.REMOVE_PLAYER, playerVo));
 		}
 		
 		public function addMonster(monsterVo:MonsterVo):void
@@ -160,6 +166,9 @@ package model
 		public function getMapDataOnPosition(x:int, y:int):Array
 		{
 			var viewMapData:Array = [];
+			if(0 > x || 0 > y || _sceneHeight <= y || _sceneWidth <= x)
+				return viewMapData;
+			viewMapData.push({x:x,y:y,value:MapDataType.GROUND});
 			// 四个方向
 			var xpos:int = x;
 			var ypos:int = y-1;
@@ -264,6 +273,15 @@ package model
 		{
 			// TODO Auto Generated method stub
 			return null;
+		}
+		
+		/**
+		 * 清空当前地图 
+		 */		
+		public function cleanMap():void
+		{
+			// TODO Auto Generated method stub
+			
 		}
 	}
 }

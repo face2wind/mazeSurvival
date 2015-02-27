@@ -1,7 +1,11 @@
 package model.vo
 {
+	import event.SceneEvent;
+	
 	import face2wind.customUIComponents.Message;
+	import face2wind.event.ParamEvent;
 	import face2wind.event.PropertyChangeEvent;
+	import face2wind.manager.EventManager;
 	
 	import findPath.AStarPathFinder;
 	import findPath.IPathFinder;
@@ -23,6 +27,8 @@ package model.vo
 	{
 		public function PlayerVo()
 		{
+			_pathFinder = new AStarPathFinder();
+			_pathFinder.direction8 = false;
 		}
 		
 		/**
@@ -49,19 +55,14 @@ package model.vo
 		 */		
 		private var _curMovingPath:Array = null;
 		
-		private var _pathFinder:IPathFinder = new AStarPathFinder();
+		private var _pathFinder:AStarPathFinder;
 		
 		/**
 		 * 思考，根据当前状态决定下一步该怎么做 
 		 */		
 		public override function thinking():void
 		{
-//			if(0 < y)
-//				movingDir = MovingDirection.UP;
-//			else
-//				movingDir = MovingDirection.STOP;
-//			return;
-			
+			super.thinking();
 			updateMindMap();
 			movingToNext();
 			movingStep();
@@ -75,16 +76,21 @@ package model.vo
 			if(null == _curMovingPath || 1 > _curMovingPath.length){ //当前没有路径，不移动
 				movingDir = MovingDirection.STOP;
 				curIsMoving = false;
+				EventManager.getInstance().dispatchToView(new ParamEvent(SceneEvent.SHOW_EXPOLORE_LIST, _expoloreDic));
 				return;
 			}
 			
 			var nextPoint:Point = _curMovingPath[0];
+			setDirection(nextPoint);
 			if(nextPoint.x == x && nextPoint.y == y){ //已到达下一个点，换方向
 				_curMovingPath.shift();
-				setDirection(nextPoint);
-			}else{
-				
 			}
+//			if(undefined != _expoloreDic[x+"_"+y]){ // 当前经过的位置在可探索列表里，则删除
+//				delete _expoloreDic[x+"_"+y];
+//				--_expoloreNum;
+//				EventManager.getInstance().dispatchToView(new ParamEvent(SceneEvent.SHOW_EXPOLORE_LIST, _expoloreDic));
+//			}
+			EventManager.getInstance().dispatchToView(new ParamEvent(SceneEvent.SHOW_EXPOLORE_LIST, _expoloreDic));
 		}
 		
 		/**
@@ -92,16 +98,28 @@ package model.vo
 		 */		
 		private function movingToNext():void
 		{
-			if(_exitPoint) // 已有出口，直奔出口
+			if(_exitPoint){ // 已有出口，直奔出口
 				moveToPath(_exitPoint, true);
-			if(0 < _expoloreNum){
-				var epIndex:int = Math.random()*_expoloreNum; // 随机找一个探索点
+				return;
+			}
+			if(0 < _expoloreNum){ // 找一个最近的探索点寻路
+				var minPoint:Point = null;
+				var min:Number = -1;
 				for each (var ePoint:Point in _expoloreDic) {
-					if(0 == epIndex--)
-						break;
+					var curPath:Array = _pathFinder.findPath(new Point(x,y), ePoint);
+					var curDis:Number = curPath?curPath.length:999;
+//					var curDis:Number = Math.sqrt( (ePoint.x-x)*(ePoint.x-x) + (ePoint.y-y)*(ePoint.y-y) );
+					if(null == minPoint || curDis < min){
+						minPoint = ePoint;
+						min = curDis;
+					}
 				}
-				if(ePoint)
-					moveToPath(ePoint);
+				if(minPoint){
+					moveToPath(minPoint);
+				}
+			}else{
+				Message.show("无路可走了");
+				EventManager.getInstance().dispatchToController(new ParamEvent(SceneEvent.RESTART_SURVIVAL));
 			}
 		}
 		
@@ -113,14 +131,21 @@ package model.vo
 			var updateMapData:Array = sManager.getMapDataOnPosition(x,y);
 			var updateLifeData:Array = sManager.getLifeAroundPosition(x,y);
 			var tmpPoint:Object;
+			var exitPoint:Point = SceneManager.getInstance().exitPoint;
 			for (var i:int = 0; i < updateMapData.length; i++) 
 			{
 				tmpPoint = updateMapData[i];
+				var oldValue:int = _mindMapData[tmpPoint.x][tmpPoint.y];
 				_mindMapData[tmpPoint.x][tmpPoint.y] = tmpPoint.value;
-				if(MapDataType.CAN_EXPLORE == tmpPoint.value){ // 可探索区
+				if(tmpPoint.x == exitPoint.x && tmpPoint.y == exitPoint.y)
+					_exitPoint = exitPoint;
+				if(MapDataType.OBSTACLE == oldValue && // 之前未探索过
+					MapDataType.CAN_EXPLORE == tmpPoint.value){ // 可探索区
 					_expoloreDic[tmpPoint.x+"_"+tmpPoint.y] = new Point(tmpPoint.x, tmpPoint.y);
 					++_expoloreNum;
-				}else if(undefined != _expoloreDic[tmpPoint.x+"_"+tmpPoint.y]){ // 不是可探索区，但可探索列表里有，则删除
+				}
+				if(MapDataType.CAN_EXPLORE != tmpPoint.value &&
+					undefined != _expoloreDic[tmpPoint.x+"_"+tmpPoint.y]){ // 不是可探索区，但可探索列表里有，则删除
 					delete _expoloreDic[tmpPoint.x+"_"+tmpPoint.y];
 					--_expoloreNum;
 				}
@@ -147,9 +172,9 @@ package model.vo
 				return;
 			
 			curIsMoving = true;
-			_curMovingPath.shift();
 			
-			Message.show("go to point("+targetPoint.x+", "+targetPoint.y+")");
+			EventManager.getInstance().dispatchToView(new ParamEvent(SceneEvent.SHOW_EXPOLORE_LIST, _expoloreDic));
+			trace("go to point("+targetPoint.x+", "+targetPoint.y+")");
 		}
 	}
 }

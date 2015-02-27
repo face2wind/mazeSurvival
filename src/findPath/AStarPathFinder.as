@@ -62,6 +62,11 @@ package findPath
 		
 		private var mapHeight:int;
 		
+		/**
+		 * 是否8个方向寻路，否则表示4方向寻路
+		 */
+		public var direction8:Boolean = true;
+		
 		public function setMapData(data:Array):void
 		{
 			if(null == data || 0 == data.length)
@@ -115,13 +120,16 @@ package findPath
 			var height:int = _mapData[0].length-1;
 			
 			if(0 < curPoint.x  && canMovingArea(_mapData[curPoint.x-1][curPoint.y].mapType) ) // 左
-					surroundArr.push(_mapData[curPoint.x-1][curPoint.y]);
+				surroundArr.push(_mapData[curPoint.x-1][curPoint.y]);
 			if(width > curPoint.x && canMovingArea(_mapData[curPoint.x+1][curPoint.y].mapType) ) // 右
 				surroundArr.push(_mapData[curPoint.x+1][curPoint.y]);
 			if(0 < curPoint.y && canMovingArea(_mapData[curPoint.x][curPoint.y-1].mapType) ) // 上
 				surroundArr.push(_mapData[curPoint.x][curPoint.y-1]);
 			if(height > curPoint.y && canMovingArea(_mapData[curPoint.x][curPoint.y+1].mapType) ) // 下
 				surroundArr.push(_mapData[curPoint.x][curPoint.y+1]);
+			
+			if(!direction8)
+				return surroundArr;
 			
 			if( 0 < curPoint.x && 0 < curPoint.y &&
 				canMovingArea(_mapData[curPoint.x-1][curPoint.y-1].mapType) && // 左上
@@ -197,7 +205,7 @@ package findPath
 				curAp = curAp.prePoint;
 			}
 			if(curAp == startAPoint)
-				path.push(curAp);
+				path.unshift(curAp);
 			else
 				return null;
 			
@@ -207,7 +215,6 @@ package findPath
 				realPath.push(new Point(path[i].x, path[i].y));
 				msg += ("("+path[i].x+","+path[i].y+") -> ");
 			}
-//			trace(msg);
 			return realPath;
 		}
 		

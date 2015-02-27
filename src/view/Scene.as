@@ -43,6 +43,10 @@ package view
 		 */		
 		private var pathLayer:BaseSprite;
 		/**
+		 * 探索层 
+		 */		
+		private var exploreLayer:BaseSprite;
+		/**
 		 * 生物层 
 		 */		
 		private var liveLayer:BaseSprite;
@@ -72,6 +76,8 @@ package view
 			addChild(elementLayer);
 			pathLayer = new BaseSprite();
 			addChild(pathLayer);
+			exploreLayer = new BaseSprite();
+			addChild(exploreLayer);
 			liveLayer = new BaseSprite();
 			addChild(liveLayer);
 			
@@ -101,6 +107,7 @@ package view
 			
 			pathFinder.setMapData(mapData);
 			elementLayer.removeAllChildren();
+			elementLayer.graphics.clear();
 			var g:Graphics = meshShape.graphics;
 			g.clear();
 			g.lineStyle(1,0xff00ff);
@@ -193,13 +200,9 @@ package view
 		{
 			{ // 渲染所有玩家跟怪物
 				for each (var player:Player in playerDic) 
-				{
 					player.rendering(step);
-				}
 				for each (var monster:Monster in monsterDic) 
-				{
 					player.rendering(step);
-				}
 			}
 		}
 		
@@ -210,6 +213,17 @@ package view
 			player.move(manager.enterPoint.x*MapItem.WIDTH,manager.enterPoint.y*MapItem.HEIGHT);
 			liveLayer.addChild(player);
 			playerDic[player.playerVo.id] = player;
+		}
+		
+		private function onRemovePlayerHandler(e:ParamEvent):void
+		{
+			var playerVo:PlayerVo = e.param as PlayerVo;
+			var player:Player = playerDic[playerVo.id];
+			if(null == player)
+				return;
+			if(liveLayer.contains(player))
+				liveLayer.removeChild(player);
+			delete playerDic[playerVo.id];
 		}
 		
 		private function onCreateMonsterHandler(e:ParamEvent):void
@@ -228,6 +242,21 @@ package view
 		}
 		
 		/**
+		 * 重新刷新探索点显示 
+		 * @param e
+		 */		
+		private function onUpdateExpoloreHandler(e:ParamEvent):void
+		{
+			var dic:Dictionary = e.param as Dictionary;
+			exploreLayer.graphics.clear();
+			exploreLayer.graphics.beginFill(0xff2020, 0.5);
+			for each (var p:Point in dic){
+				exploreLayer.graphics.drawRect(p.x*MapItem.WIDTH, p.y*MapItem.HEIGHT, MapItem.WIDTH, MapItem.HEIGHT);
+			}
+			exploreLayer.graphics.endFill();
+		}
+		
+		/**
 		 * [继承] 恢复资源
 		 * 
 		 */		
@@ -237,7 +266,9 @@ package view
 			manager.addEventListener(SceneEvent.RESTART_DEMO, onRestartDemoHandler);
 			manager.addEventListener(SceneEvent.REBUILD_MAP, onRebuildSceneHandler);
 			manager.addEventListener(SceneEvent.CREATE_PLAYER, onCreatePlayerHandler);
+			manager.addEventListener(SceneEvent.REMOVE_PLAYER, onRemovePlayerHandler);
 			manager.addEventListener(SceneEvent.CREATE_MONSTER, onCreateMonsterHandler);
+			eventManager.bindToView(SceneEvent.SHOW_EXPOLORE_LIST, onUpdateExpoloreHandler);
 			
 			RenderManager.getInstance().add(this);
 		}
@@ -253,6 +284,7 @@ package view
 			manager.removeEventListener(SceneEvent.REBUILD_MAP, onRebuildSceneHandler);
 			manager.removeEventListener(SceneEvent.CREATE_PLAYER, onCreatePlayerHandler);
 			manager.removeEventListener(SceneEvent.CREATE_MONSTER, onCreateMonsterHandler);
+			eventManager.unbindToView(SceneEvent.SHOW_EXPOLORE_LIST, onUpdateExpoloreHandler);
 			
 			RenderManager.getInstance().remove(this);
 		}

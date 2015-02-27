@@ -21,6 +21,8 @@ package controller
 	 */
 	public class MazeController extends Controller
 	{
+		private var survivalPlayerVo:PlayerVo = new PlayerVo();
+		
 		public function MazeController()
 		{
 			if(instance)
@@ -33,18 +35,26 @@ package controller
 			LayerManager.getInstance().getLayer(LayerEnum.SCENE_LAYER).addChild(_scene);
 			
 			eventManager.bindToController(SceneEvent.PATH_SHOW_COMPLETE, onShowPathCompleteHandler);
+			eventManager.bindToController(SceneEvent.RESTART_SURVIVAL, onRestartSurvivalHandler);
 			
 			startingSurvival();
 //			manager.reStartDemo();
 		}
 		
+		private function onRestartSurvivalHandler(e:ParamEvent):void
+		{
+			startingSurvival();
+		}
+		
 		private function startingSurvival():void
 		{
-			manager.initMaze();
+			manager.removePlayer(survivalPlayerVo);
+			manager.cleanMap();
 			
-			var pvo:PlayerVo = new PlayerVo();
-			pvo.rebuildMindMap();
-			manager.addPlayer(pvo);
+			manager.initMaze();
+			survivalPlayerVo.rebuildMindMap();
+			manager.addPlayer(survivalPlayerVo);
+			
 			var mvo:MonsterVo = new MonsterVo();
 			mvo.rebuildMindMap();
 			manager.addMonster(mvo);
