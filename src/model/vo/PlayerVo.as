@@ -129,7 +129,7 @@ package model.vo
 		private function updateMindMap():void
 		{
 			var updateMapData:Array = sManager.getMapDataOnPosition(x,y);
-			var updateLifeData:Array = sManager.getLifeAroundPosition(x,y);
+			var updateMonsterData:Array = sManager.getLifeAroundPosition(x,y);
 			var tmpPoint:Object;
 			var exitPoint:Point = SceneManager.getInstance().exitPoint;
 			for (var i:int = 0; i < updateMapData.length; i++) 

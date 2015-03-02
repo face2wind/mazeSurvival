@@ -12,7 +12,7 @@ package view
 		public function Monster()
 		{
 			super();
-			_speed = 3;
+			_speed = 5;
 		}
 		
 		/**

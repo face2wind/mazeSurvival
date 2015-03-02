@@ -182,6 +182,11 @@ package model.vo
 		protected var sManager:SceneManager = SceneManager.getInstance();
 		
 		/**
+		 * 当前渲染步数，外部渲染器设置 
+		 */		
+		public var step:int = 0;
+		
+		/**
 		 * 思考，根据当前状态决定下一步该怎么做 
 		 */		
 		public function thinking():void

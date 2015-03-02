@@ -46,6 +46,7 @@ package view
 		
 		public function rendering(step:int = 0):void
 		{
+			livingVo.step = step;
 			livingVo.thinking();
 			moving();
 		}

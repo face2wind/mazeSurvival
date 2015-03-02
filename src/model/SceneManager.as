@@ -268,17 +268,21 @@ package model
 		 * 获取指定位置视野能观察到的生物（包括人和怪物） 
 		 * @param x
 		 * @param y
+		 * @param isPlayer 是否获取玩家列表（否，表示获取怪物列表）
 		 * @return 
 		 */		
-		public function getLifeAroundPosition(x:int, y:int):Array
+		public function getLifeAroundPosition(x:int, y:int, isPlayer:Boolean = false):Array
 		{
 			var viewLifeData:Array = [];
-			var mapLifesDic:Dictionary; //当前时刻，场景里生物字典，坐标为key，值是vo 
-			for each (var vo:LivingThingVo in playerVoDic) {
-				mapLifesDic[vo.x+"_"+vo.y] = vo;
-			}
-			for each (var vo:LivingThingVo in monsterVoDic) {
-				mapLifesDic[vo.x+"_"+vo.y] = vo;
+			var mapLifesDic:Dictionary = new Dictionary(); //当前时刻，场景里生物字典，坐标为key，值是vo 
+			if(isPlayer){
+				for each (var pvo:LivingThingVo in playerVoDic) {
+					mapLifesDic[pvo.x+"_"+pvo.y] = pvo;
+				}
+			}else{
+				for each (var mvo:LivingThingVo in monsterVoDic) {
+					mapLifesDic[mvo.x+"_"+mvo.y] = mvo;
+				}
 			}
 			
 			// 四个方向

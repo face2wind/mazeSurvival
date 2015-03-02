@@ -22,12 +22,22 @@ package model.vo
 			super();
 			_pathFinder = new AStarPathFinder();
 			_pathFinder.direction8 = false;
+			_viewPlayerList = new Dictionary();
 		}
 		
 		/**
 		 * 当前任务：1 自由寻路探索，2 追杀玩家 
 		 */		
 		private var _curMission:int = 1;
+		
+		/**
+		 * 当前可追杀的玩家列表 
+		 */		
+		private var _viewPlayerList:Dictionary;
+		/**
+		 * 当前可追杀的玩家数量 
+		 */		
+		private var _viewPlayerNum:int = 0;
 		
 		/**
 		 * 玩家探索到的出口，null表示未探索到 
@@ -64,6 +74,15 @@ package model.vo
 			updateMindMap();
 			movingToNext();
 			movingStep();
+			updatePlayerList();
+		}
+		
+		/**
+		 * 定时刷新玩家信息，超过一定时间没更新的玩家删除信息 
+		 */		
+		private function updatePlayerList():void
+		{
+			xx			
 		}
 		
 		/**
@@ -74,6 +93,7 @@ package model.vo
 			if(null == _curMovingPath || 1 > _curMovingPath.length){ //当前没有路径，不移动
 				movingDir = MovingDirection.STOP;
 				curIsMoving = false;
+				_curMission = 1; // 路径都走完了，跳到自由探索寻路状态
 //				EventManager.getInstance().dispatchToView(new ParamEvent(SceneEvent.SHOW_EXPOLORE_LIST, _expoloreDic));
 				return;
 			}
@@ -95,23 +115,43 @@ package model.vo
 //				moveToPath(_exitPoint, true);
 //				return;
 //			}
-			if(0 < _expoloreNum){ // 找一个最近的探索点寻路
-				var minPoint:Point = null;
-				var min:Number = -1;
-				for each (var ePoint:Point in _expoloreDic) {
-					var curPath:Array = _pathFinder.findPath(new Point(x,y), ePoint);
-					var curDis:Number = curPath?curPath.length:999;  // 按寻路的路径长度判断距离远近
-					//					var curDis:Number = Math.sqrt( (ePoint.x-x)*(ePoint.x-x) + (ePoint.y-y)*(ePoint.y-y) ); // 按直线距离判断远近
-					if(null == minPoint || curDis < min){
-						minPoint = ePoint;
+			var min:Number = -1;
+			var curPath:Array;
+			var curDis:Number;
+			if(1 == _curMission){ // 自由探索寻路状态
+				if(0 < _expoloreNum){ // 找一个最近的探索点寻路
+					var minPoint:Point = null;
+					min = -1;
+					for each (var ePoint:Point in _expoloreDic) {
+						curPath = _pathFinder.findPath(new Point(x,y), ePoint);
+						curDis = curPath?curPath.length:999;  // 按寻路的路径长度判断距离远近
+						//					var curDis:Number = Math.sqrt( (ePoint.x-x)*(ePoint.x-x) + (ePoint.y-y)*(ePoint.y-y) ); // 按直线距离判断远近
+						if(null == minPoint || curDis < min){
+							minPoint = ePoint;
+							min = curDis;
+						}
+					}
+					if(minPoint){
+						moveToPath(minPoint);
+					}
+				}else{
+					//				Message.show("无路可走了");
+				}
+			}else if(2 == _curMission){ // 追杀状态，找一个最近的玩家追赶
+				var minPObj:Object = null;
+				min = -1;
+				for each (var pObj:Object in _viewPlayerList) {
+//					curPath = _pathFinder.findPath(new Point(x,y),  new Point(pObj.x, pObj.y) );
+//					curDis = curPath?curPath.length:999;  // 按寻路的路径长度判断距离远近
+					curDis  = Math.sqrt( (pObj.x-x)*(pObj.x-x) + (pObj.y-y)*(pObj.y-y) ); // 按直线距离判断远近
+					if(null == minPObj || curDis < min){
+						minPObj = pObj;
 						min = curDis;
 					}
 				}
-				if(minPoint){
-					moveToPath(minPoint);
+				if(null != minPObj){
+					moveToPath(new Point(minPObj.x, minPObj.y) );
 				}
-			}else{
-				//				Message.show("无路可走了");
 			}
 		}
 		
@@ -121,7 +161,7 @@ package model.vo
 		private function updateMindMap():void
 		{
 			var updateMapData:Array = sManager.getMapDataOnPosition(x,y);
-			var updateLifeData:Array = sManager.getLifeAroundPosition(x,y);
+			var updatePlayerData:Array = sManager.getLifeAroundPosition(x,y,true);
 			var tmpPoint:Object;
 			var exitPoint:Point = SceneManager.getInstance().exitPoint;
 			for (var i:int = 0; i < updateMapData.length; i++) 
@@ -144,7 +184,25 @@ package model.vo
 			}
 			_pathFinder.setMapData(_mindMapData);
 			
-			_curMission xxx
+			for each (var playerVo:PlayerVo in updatePlayerData) {
+				var pObj:Object = _viewPlayerList[playerVo.id];
+				if(null == pObj){
+					_viewPlayerList[playerVo.id] = {};
+					_viewPlayerNum ++;
+				}
+				pObj = _viewPlayerList[playerVo.id];
+				
+				pObj.id = playerVo.id;
+				pObj.x = playerVo.x;
+				pObj.y = playerVo.y;
+				pObj.lastUpdateTime = new Date().time;
+			}
+			
+			if(0 < _viewPlayerNum){ // 附近有玩家，切换到追杀状态
+				_curMission = 2;
+			}else{
+				_curMission = 1;
+			}
 		}
 		
 		/**
