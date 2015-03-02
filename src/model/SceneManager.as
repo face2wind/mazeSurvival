@@ -10,6 +10,7 @@ package model
 	import flash.geom.Point;
 	import flash.utils.Dictionary;
 	
+	import model.vo.LivingThingVo;
 	import model.vo.MonsterVo;
 	import model.vo.PlayerVo;
 	
@@ -271,8 +272,55 @@ package model
 		 */		
 		public function getLifeAroundPosition(x:int, y:int):Array
 		{
-			// TODO Auto Generated method stub
-			return null;
+			var viewLifeData:Array = [];
+			var mapLifesDic:Dictionary; //当前时刻，场景里生物字典，坐标为key，值是vo 
+			for each (var vo:LivingThingVo in playerVoDic) {
+				mapLifesDic[vo.x+"_"+vo.y] = vo;
+			}
+			for each (var vo:LivingThingVo in monsterVoDic) {
+				mapLifesDic[vo.x+"_"+vo.y] = vo;
+			}
+			
+			// 四个方向
+			var xpos:int = x;
+			var ypos:int = y-1;
+			while(0 < ypos){ // 上
+				if(MapDataType.OBSTACLE == mapData[xpos][ypos]){
+					break;
+				}else if(undefined != mapLifesDic[xpos+"_"+ypos]){
+					viewLifeData.push(mapLifesDic[xpos+"_"+ypos]);
+				}
+				ypos--;
+			}
+			ypos = y+1;
+			while(_sceneHeight > ypos){ // 下
+				if(MapDataType.OBSTACLE == mapData[xpos][ypos]){
+					break;
+				}else if(undefined != mapLifesDic[xpos+"_"+ypos]){
+					viewLifeData.push(mapLifesDic[xpos+"_"+ypos]);
+				}
+				ypos++;
+			}
+			xpos = x-1;
+			ypos = y;
+			while(0 < xpos){ // 左
+				if(MapDataType.OBSTACLE == mapData[xpos][ypos]){
+					break;
+				}else if(undefined != mapLifesDic[xpos+"_"+ypos]){
+					viewLifeData.push(mapLifesDic[xpos+"_"+ypos]);
+				}
+				xpos--;
+			}
+			xpos = x+1;
+			while(_sceneWidth >xpos){ // 右
+				if(MapDataType.OBSTACLE == mapData[xpos][ypos]){
+					break;
+				}else if(undefined != mapLifesDic[xpos+"_"+ypos]){
+					viewLifeData.push(mapLifesDic[xpos+"_"+ypos]);
+				}
+				xpos++;
+			}
+			return viewLifeData;
 		}
 		
 		/**

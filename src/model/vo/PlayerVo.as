@@ -107,8 +107,8 @@ package model.vo
 				var min:Number = -1;
 				for each (var ePoint:Point in _expoloreDic) {
 					var curPath:Array = _pathFinder.findPath(new Point(x,y), ePoint);
-					var curDis:Number = curPath?curPath.length:999;
-//					var curDis:Number = Math.sqrt( (ePoint.x-x)*(ePoint.x-x) + (ePoint.y-y)*(ePoint.y-y) );
+					var curDis:Number = curPath?curPath.length:999;  // 按寻路的路径长度判断距离远近
+//					var curDis:Number = Math.sqrt( (ePoint.x-x)*(ePoint.x-x) + (ePoint.y-y)*(ePoint.y-y) ); // 按直线距离判断远近
 					if(null == minPoint || curDis < min){
 						minPoint = ePoint;
 						min = curDis;
@@ -118,8 +118,8 @@ package model.vo
 					moveToPath(minPoint);
 				}
 			}else{
-				Message.show("无路可走了");
-				EventManager.getInstance().dispatchToController(new ParamEvent(SceneEvent.RESTART_SURVIVAL));
+//				Message.show("无路可走了");
+//				EventManager.getInstance().dispatchToController(new ParamEvent(SceneEvent.RESTART_SURVIVAL));
 			}
 		}
 		

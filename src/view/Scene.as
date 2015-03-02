@@ -199,10 +199,21 @@ package view
 		public function rendering(step:int = 0):void
 		{
 			{ // 渲染所有玩家跟怪物
-				for each (var player:Player in playerDic) 
+				var monsterPointList:Dictionary = new Dictionary();
+				for each (var monster:Monster in monsterDic){
+					monster.rendering(step);
+					monsterPointList[monster.monsterVo.x+"_"+monster.monsterVo.y] = true;
+				}
+				var needRemovePlayer:Array = [];
+				for each (var player:Player in playerDic) {
 					player.rendering(step);
-				for each (var monster:Monster in monsterDic) 
-					player.rendering(step);
+					if(monsterPointList[player.playerVo.x+"_"+player.playerVo.y]){ // 玩家装上怪物，玩家被消灭
+						needRemovePlayer.push(player.playerVo);
+					}
+				}
+				for each (var pvo:PlayerVo in needRemovePlayer) {
+					manager.removePlayer(pvo);
+				}
 			}
 		}
 		
