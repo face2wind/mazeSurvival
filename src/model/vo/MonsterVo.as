@@ -82,7 +82,14 @@ package model.vo
 		 */		
 		private function updatePlayerList():void
 		{
-			xx			
+			if(0 != step%30)
+				return;
+			var now:Number = new Date().time;
+			for (var key:* in _viewPlayerList){
+				var pObj:Object = _viewPlayerList[key];
+				if( (pObj.lastUpdateTime+2000) > now )
+					delete _viewPlayerList[key];
+			}
 		}
 		
 		/**
@@ -111,6 +118,8 @@ package model.vo
 		 */		
 		private function movingToNext():void
 		{
+			if(0 != step%10)
+				return;
 //			if(_exitPoint){ // 已有出口，直奔出口
 //				moveToPath(_exitPoint, true);
 //				return;
@@ -118,7 +127,7 @@ package model.vo
 			var min:Number = -1;
 			var curPath:Array;
 			var curDis:Number;
-			if(1 == _curMission){ // 自由探索寻路状态
+			if(1 == _curMission){ // 自由探索寻路状态 =====================================
 				if(0 < _expoloreNum){ // 找一个最近的探索点寻路
 					var minPoint:Point = null;
 					min = -1;
@@ -137,7 +146,7 @@ package model.vo
 				}else{
 					//				Message.show("无路可走了");
 				}
-			}else if(2 == _curMission){ // 追杀状态，找一个最近的玩家追赶
+			}else if(2 == _curMission){ // 追杀状态，找一个最近的玩家追赶 =====================================
 				var minPObj:Object = null;
 				min = -1;
 				for each (var pObj:Object in _viewPlayerList) {
@@ -150,7 +159,7 @@ package model.vo
 					}
 				}
 				if(null != minPObj){
-					moveToPath(new Point(minPObj.x, minPObj.y) );
+					moveToPath(new Point(minPObj.x, minPObj.y), true);
 				}
 			}
 		}
