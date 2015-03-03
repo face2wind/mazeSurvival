@@ -13,7 +13,7 @@ package model.vo
 
 	/**
 	 * 怪物vo
-	 * @author face2wind
+	 * @author face2wind 
 	 */
 	public class MonsterVo extends LivingThingVo
 	{
