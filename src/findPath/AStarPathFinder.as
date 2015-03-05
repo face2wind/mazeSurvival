@@ -40,27 +40,27 @@ package findPath
 		/**
 		 * 地图数据 
 		 */		
-		private var _mapData:Array;
+		protected var _mapData:Array;
 		/**
 		 * 开启列表 
 		 */		
-		private var openList:Array;
+		protected var openList:Array;
 		/**
 		 * 关闭列表 
 		 */		
-		private var closeList:Array;
+		protected var closeList:Array;
 		/**
 		 * 当前寻路的起始点 
 		 */		
-		private var startAPoint:AStarPoint;
+		protected var startAPoint:AStarPoint;
 		/**
 		 * 当前寻路的终点 
 		 */		
-		private var endAPoint:AStarPoint;
+		protected var endAPoint:AStarPoint;
 		
-		private var mapWidth:int;
+		protected var mapWidth:int;
 		
-		private var mapHeight:int;
+		protected var mapHeight:int;
 		
 		/**
 		 * 是否8个方向寻路，否则表示4方向寻路

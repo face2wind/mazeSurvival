@@ -5,6 +5,8 @@ package model
 	import face2wind.event.ParamEvent;
 	import face2wind.manager.EventManager;
 	
+	import findPath.AStarPathFinder;
+	
 	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
 	import flash.geom.Point;
@@ -127,21 +129,28 @@ package model
 		private function createRandomMap():void
 		{
 			mapData = [];
-			for (var i:int = 0; i < _sceneWidth; i++) {
-				mapData[i] = [];
-				for (var j:int = 0; j < _sceneHeight; j++){ 
-					if(0 == i || _sceneWidth-1 == i) // 两边不要生成障碍
-						mapData[i][j] = MapDataType.GROUND;
-					else
-						mapData[i][j] = MapDataType.getRandomType();
+			var finder:AStarPathFinder = new AStarPathFinder();
+			while(true) // 无限生成地图，直到生成的地图有通路
+			{
+				for (var i:int = 0; i < _sceneWidth; i++) {
+					mapData[i] = [];
+					for (var j:int = 0; j < _sceneHeight; j++){ 
+						if(0 == i || _sceneWidth-1 == i) // 两边不要生成障碍
+							mapData[i][j] = MapDataType.GROUND;
+						else
+							mapData[i][j] = MapDataType.getRandomType();
+					}
 				}
+				var maxX:int = _sceneWidth-1;
+				var mapH:int = _sceneHeight;
+				var randomY1:int = (Math.random()+mapH/2)%mapH;
+				var randomY2:int = Math.random()*mapH;
+				_enterPoint = new Point(0,randomY1);
+				_exitPoint = new Point(maxX, randomY2);
+				finder.setMapData(mapData);
+				if(null != finder.findPath(_enterPoint, _exitPoint)) // 有通路，跳出循环
+					break;
 			}
-			var maxX:int = _sceneWidth-1;
-			var mapH:int = _sceneHeight;
-			var randomY1:int = (Math.random()+mapH/2)%mapH;
-			var randomY2:int = Math.random()*mapH;
-			_enterPoint = new Point(0,randomY1);
-			_exitPoint = new Point(maxX, randomY2);
 		}
 		
 		public function initMaze():void

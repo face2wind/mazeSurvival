@@ -8,6 +8,7 @@ package model.vo
 	import face2wind.manager.EventManager;
 	
 	import findPath.AStarPathFinder;
+	import findPath.AvoidMonsterPathFinder;
 	import findPath.IPathFinder;
 	
 	import flash.events.EventDispatcher;
@@ -28,6 +29,7 @@ package model.vo
 		public function PlayerVo()
 		{
 			_pathFinder = new AStarPathFinder();
+			_amFinder = new AvoidMonsterPathFinder();
 			_pathFinder.direction8 = false;
 		}
 		
@@ -56,6 +58,22 @@ package model.vo
 		private var _curMovingPath:Array = null;
 		
 		private var _pathFinder:AStarPathFinder;
+		
+		private var _amFinder:AvoidMonsterPathFinder;
+		
+		/**
+		 * 当前任务：1 自由寻路探索，2 逃跑（有怪物追杀） 
+		 */		
+		private var _curMission:int = 1;
+		
+		/**
+		 * 当前可追杀的玩家列表 
+		 */		
+		private var _viewMonsterList:Dictionary;
+		/**
+		 * 当前附近怪物的数量 
+		 */		
+		private var _viewMonsterNum:int = 0;
 		
 		/**
 		 * 思考，根据当前状态决定下一步该怎么做 
@@ -98,28 +116,37 @@ package model.vo
 		 */		
 		private function movingToNext():void
 		{
-			if(_exitPoint){ // 已有出口，直奔出口
-				moveToPath(_exitPoint, true);
+			if(0 != step%10)
 				return;
-			}
-			if(0 < _expoloreNum){ // 找一个最近的探索点寻路
-				var minPoint:Point = null;
-				var min:Number = -1;
-				for each (var ePoint:Point in _expoloreDic) {
-					var curPath:Array = _pathFinder.findPath(new Point(x,y), ePoint);
-					var curDis:Number = curPath?curPath.length:999;  // 按寻路的路径长度判断距离远近
-//					var curDis:Number = Math.sqrt( (ePoint.x-x)*(ePoint.x-x) + (ePoint.y-y)*(ePoint.y-y) ); // 按直线距离判断远近
-					if(null == minPoint || curDis < min){
-						minPoint = ePoint;
-						min = curDis;
+			if(1 == _curMission){ // 自由探索寻路状态 =====================================
+				if(_exitPoint){ // 已有出口，直奔出口
+					moveToPath(_exitPoint, true);
+					return;
+				}
+				if(0 < _expoloreNum){ // 找一个最近的探索点寻路
+					var minPoint:Point = null;
+					var min:Number = -1;
+					for each (var ePoint:Point in _expoloreDic) {
+						var curPath:Array = _pathFinder.findPath(new Point(x,y), ePoint);
+						var curDis:Number = curPath?curPath.length:999;  // 按寻路的路径长度判断距离远近
+						//					var curDis:Number = Math.sqrt( (ePoint.x-x)*(ePoint.x-x) + (ePoint.y-y)*(ePoint.y-y) ); // 按直线距离判断远近
+						if(null == minPoint || curDis < min){
+							minPoint = ePoint;
+							min = curDis;
+						}
 					}
+					if(minPoint){
+						moveToPath(minPoint);
+					}
+				}else{
+					//				Message.show("无路可走了");
+					//				EventManager.getInstance().dispatchToController(new ParamEvent(SceneEvent.RESTART_SURVIVAL));
 				}
-				if(minPoint){
-					moveToPath(minPoint);
-				}
-			}else{
-//				Message.show("无路可走了");
-//				EventManager.getInstance().dispatchToController(new ParamEvent(SceneEvent.RESTART_SURVIVAL));
+			}else if(2 == _curMission){ // 逃生状态 =====================================
+				_amFinder.setMapData(_mindMapData);
+				var escapePoint:Point = _amFinder.findEscapePoint(new Point(x,y), _viewMonsterList);
+				if(null != escapePoint)
+					moveToPath(escapePoint, true);
 			}
 		}
 		
@@ -151,6 +178,26 @@ package model.vo
 				}
 			}
 			_pathFinder.setMapData(_mindMapData);
+			
+			for each (var monsterVo:MonsterVo in updateMonsterData) {
+				var pObj:Object = _viewMonsterList[monsterVo.id];
+				if(null == pObj){
+					_viewMonsterList[monsterVo.id] = {};
+					_viewMonsterNum ++;
+				}
+				pObj = _viewMonsterList[monsterVo.id];
+				
+				pObj.id = monsterVo.id;
+				pObj.x = monsterVo.x;
+				pObj.y = monsterVo.y;
+				pObj.lastUpdateTime = new Date().time;
+			}
+			
+			if(0 < _viewMonsterNum){ // 附近有怪物，切换到逃生状态
+				_curMission = 2;
+			}else{
+				_curMission = 1;
+			}
 		}
 		
 		/**
@@ -174,7 +221,7 @@ package model.vo
 			curIsMoving = true;
 			
 			EventManager.getInstance().dispatchToView(new ParamEvent(SceneEvent.SHOW_EXPOLORE_LIST, _expoloreDic));
-			trace("go to point("+targetPoint.x+", "+targetPoint.y+")");
+//			trace("go to point("+targetPoint.x+", "+targetPoint.y+")");
 		}
 	}
 }
