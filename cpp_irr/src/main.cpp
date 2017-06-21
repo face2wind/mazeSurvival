@@ -1,3 +1,5 @@
+#include "scene.h"
+
 #include <irrlicht.h>
 using namespace irr;
 using namespace core;
@@ -15,77 +17,99 @@ using namespace face2wind;
 #pragma comment(lib, "elegance.lib")
 #endif
 
-int TestMy2D()
-{
-	/*video::E_DRIVER_TYPE driverType = driverChoiceConsole();
-	if (driverType == video::EDT_COUNT)
-		driverType = video::EDT_OPENGL;*/
-
-	IrrlichtDevice *device = createDevice(video::EDT_OPENGL, core::dimension2d<u32>(512, 384));
-	if (nullptr == device)
-		return 1; // could not create selected driver.
-
-	device->setWindowCaption(L"Maze Test");
-
-	video::IVideoDriver* driver = device->getVideoDriver();
-	
-	driver->getMaterial2D().TextureLayer[0].BilinearFilter = true;
-	driver->getMaterial2D().AntiAliasing = video::EAAM_FULL_BASIC;
-
-	while (device->run() && driver)
-	{
-		if (device->isWindowActive())
-		{
-			u32 time = device->getTimer()->getTime();
-
-			driver->beginScene(true, true, video::SColor(255, 90, 80, 136));
-
-			core::position2d<s32> m = device->getCursorControl()->getPosition();
-			driver->draw2DRectangle(video::SColor(100, 255, 255, 255),
-				core::rect<s32>(m.X - 20, m.Y - 20, m.X + 20, m.Y + 20));
-
-			for (int x = 0; x < 20; x+=2)
-				for (int y = 0; y < 20; y+=2)
-					driver->draw2DRectangle(video::SColor(255, 255, 255, 255),
-						core::rect<s32>(x*20, y*20, x*20 + 20, y*20 + 20));
-
-			driver->draw2DPolygon(core::vector2d<int>((time/4)%400, 40), 10);
-
-			driver->endScene();
-		}
-	}
-
-	device->drop();
-	return 0;
-}
+bool game_running = true; // 游戏运行开关（协调两个线程）
 
 class GameViewThreadTask : public face2wind::IThreadTask
 {
 public:
 	virtual void Run()
 	{
+		Scene &scene = Scene::Instance();
+
+		scene.RestartScene();
+
 		// 线程内容
+		while (game_running)
+		{
+			int ret = scene.UpdateLogic();
+			if (0 != ret)
+			{
+				std::cout << "Scene::UpdateLogic() return " << ret << ", exit thread" << std::endl;
+				break;
+			}
+		}
+
+		game_running = false;
 	}
 };
-
-class MyNetworkHandler : public face2wind::ISerializeNetworkHandler
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define N 92
+bool R[N][N], D[N][N], v[N][N];
+int m, n;
+void dfs(int r, int c)
 {
-public:
-	virtual void OnListenFail(Port port) {}
-	virtual void OnAccept(IPAddr ip, Port port, Port local_port, NetworkID net_id) {}
-	virtual void OnConnect(IPAddr ip, Port port, Port local_port, bool success, NetworkID net_id) {}
-
-	virtual void OnRecv(NetworkID net_id, const SerializeBase *data) {}
-	virtual void OnDisconnect(NetworkID net_id) {}
-};
-
+	int d = rand() % 4, dddddd = rand() % 2 ? 1 : 3;
+	v[r][c] = true;
+	for (int i = 0; i < 4; i++) {
+		int data1[4] = { -1, 0, 1, 0 };
+		int data2[4] = { 0, -1, 0, 1 };
+		int rr = r + data1[d],
+			cc = c + data2[d];
+		if ((unsigned)rr < m && (unsigned)cc < n && !v[rr][cc]) {
+			if (d % 2)
+				R[r][c - (d == 1)] = true;
+			else
+				D[r - (d == 0)][c] = true;
+			dfs(rr, cc);
+		}
+		d = (d + dddddd) % 4;
+	}
+}
+int maintest()
+{
+	m = 10;
+	n = 10;
+	dfs(0, 0);
+	for (int c = 0; c < n; c++)
+		printf("._");
+	printf(".\n");
+	for (int r = 0; r < m; r++) {
+		printf("|");
+		for (int c = 0; c < n; c++) {
+			putchar(D[r][c] ? ' ' : '_');
+			putchar(R[r][c] ? '.' : '|');
+		}
+		printf("\n");
+	}
+	return 0;
+}
 int main()
 {
-	TestMy2D();
-	return 0;
-	/*face2wind::Thread game_view_thread;
-	game_view_thread.Run(new GameViewThreadTask());
+	IrrlichtDevice *device = createDevice(video::EDT_OPENGL, core::dimension2d<u32>(SCENE_MAP_WIDTH*GRID_LENGTH, SCENE_MAP_HEIGHT*GRID_LENGTH));
+	if (nullptr == device)
+		return 1; // could not create selected driver.
+	device->setWindowCaption(L"Maze Survival");
 
+	face2wind::Thread game_view_thread;
+	game_view_thread.Run(new GameViewThreadTask());
+	
+	Scene &scene = Scene::Instance();
+
+	scene.SetDevice(device);
+	while (game_running && device->run())
+	{
+		scene.UpdateView();
+	}
+
+	game_running = false;
+	device->drop();
+
+	game_view_thread.Join();
+	return 0;
+	/*
 	MyNetworkHandler handler;
 	SerializeNetworkManager net_mgr;
 	net_mgr.RegistSerializeHandler(&handler);
