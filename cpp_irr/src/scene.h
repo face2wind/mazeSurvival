@@ -1,10 +1,10 @@
 #pragma once
 #include <IrrlichtDevice.h>
 
-static const int GRID_LENGTH = 8;						// 格子边长（像素）
+static const int GRID_LENGTH = 5;						// 格子边长（像素）
 
-static const int SCENE_MAP_WIDTH = 61;					// 场景宽度（格子数） 地图格子长度用单数，因为两边是墙
-static const int SCENE_MAP_HEIGHT = 41;					// 场景高度（格子数）
+static const int SCENE_MAP_WIDTH = 251;					// 场景宽度（格子数） 地图格子长度用单数，因为两边是墙
+static const int SCENE_MAP_HEIGHT = 151;				// 场景高度（格子数）
 
 enum class MapDataType
 {
@@ -29,6 +29,8 @@ public:
 protected:
 	Scene();
 
+	void CreateMapPureRandom();	// 自己写的随机拆墙建地图
+	void CreateMapPrim();		// 用Prim算法生成地图
 	void CreateNewMap();
 
 	irr::IrrlichtDevice *device_;
