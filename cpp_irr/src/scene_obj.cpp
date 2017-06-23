@@ -39,23 +39,21 @@ void SceneObject::SetGridPosition(position2di posi)
 
 void SceneObject::MoveStep()
 {
-	switch (dir_)
+	if (Direction::UP == dir_)
 	{
-	case Direction::UP:
 		--pix_posi_.Y;
-		break;
-
-	case Direction::DOWN:
-		++pix_posi_.Y;
-		break;
-
-	case Direction::LEFT:
+    }
+	else if (Direction::DOWN == dir_)
+    {
+        ++pix_posi_.Y;
+    }
+    else if(Direction::LEFT == dir_)
+    {
 		--pix_posi_.X;
-		break;
-
-	case Direction::RIGHT:
-		++pix_posi_.X;
-		break;
+    }
+    else if (Direction::RIGHT == dir_)
+    {
+        ++pix_posi_.X;
 	}
 
 	grid_posi_.X = pix_posi_.X / GRID_LENGTH;

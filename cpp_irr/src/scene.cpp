@@ -84,24 +84,14 @@ int Scene::UpdateLogic(long long interval)
 		{
 			position2di target_posi = obj->GetGridPosition();
 			Direction dir = obj->GetDir();
-			switch (dir)
-			{
-			case Direction::UP:
+			if (Direction::UP == dir)
 				--target_posi.Y;
-				break;
-
-			case Direction::DOWN:
-				++target_posi.Y;
-				break;
-
-			case Direction::LEFT:
-				--target_posi.X;
-				break;
-
-			case Direction::RIGHT:
+            else if (Direction::DOWN == dir)
+                ++target_posi.Y;
+            else if (Direction::LEFT == dir)
+                --target_posi.X;
+            else if (Direction::RIGHT == dir)
 				++target_posi.X;
-				break;
-			}
 
 			if (map_data_[target_posi.X][target_posi.Y] == MapDataType::EMPTY)
 				obj->MoveStep();
