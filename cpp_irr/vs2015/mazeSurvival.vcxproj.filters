@@ -12,9 +12,24 @@
     <ClCompile Include="..\src\scene.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\scene_obj.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\maze_runner.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\scene.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scene_obj.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\maze_runner.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\basic_type.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

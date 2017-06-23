@@ -118,10 +118,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\maze_runner.cpp" />
     <ClCompile Include="..\src\scene.cpp" />
+    <ClCompile Include="..\src\scene_obj.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\basic_type.h" />
+    <ClInclude Include="..\src\maze_runner.h" />
     <ClInclude Include="..\src\scene.h" />
+    <ClInclude Include="..\src\scene_obj.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

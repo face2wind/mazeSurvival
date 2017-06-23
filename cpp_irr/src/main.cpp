@@ -1,6 +1,7 @@
 #include "scene.h"
 
 #include <irrlicht.h>
+
 using namespace irr;
 using namespace core;
 using namespace scene;
@@ -26,16 +27,21 @@ public:
 	{
 		Scene &scene = Scene::Instance();
 		scene.RestartScene(); // 创建地图也属于数据逻辑，所以放到逻辑线程，不阻塞显示线程
+		long long interval = 0;
 
 		// 线程内容
 		while (game_running)
 		{
-			int ret = scene.UpdateLogic();
+			int ret = scene.UpdateLogic(interval);
 			if (0 != ret)
 			{
 				std::cout << "Scene::UpdateLogic() return " << ret << ", exit thread" << std::endl;
 				break;
 			}
+
+			++interval;
+			if (interval < 0)
+				interval = 0;
 		}
 
 		game_running = false;

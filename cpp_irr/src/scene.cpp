@@ -1,4 +1,6 @@
 #include "scene.h"
+#include "scene_obj.h"
+
 #include <common/random.hpp>
 #include <set>
 #include <vector>
@@ -40,7 +42,9 @@ void Scene::SetDevice(irr::IrrlichtDevice *device)
 
 void Scene::RestartScene()
 {
-	this->CreateNewMap();
+	//this->CreateMapPureRandom();
+	this->CreateMapPrim();
+	this->CreateInitObjs();
 }
 
 int Scene::UpdateView()
@@ -50,27 +54,68 @@ int Scene::UpdateView()
 
 	driver_->beginScene(true, true, video::SColor(0xffA8A8A8));// 255, 255, 255, 255));
 
+	// 渲染场景
 	for (int x = 0; x <= SCENE_MAP_WIDTH; ++x)
 		for (int y = 0; y <= SCENE_MAP_HEIGHT; ++y)
 			if (MapDataType::BLOCK == map_data_[x][y]) // 只画障碍区
 			driver_->draw2DRectangle(video::SColor(0xff000000),//255, 255, 255, 255),
 				core::rect<s32>(x * GRID_LENGTH, y * GRID_LENGTH, x * GRID_LENGTH + GRID_LENGTH, y * GRID_LENGTH + GRID_LENGTH));
 
+	// 渲染场景对象
+	for (SceneObject *obj : object_list_)
+	{
+		const position2di &pos = obj->GetPixelPosition();
+		driver_->draw2DRectangle(video::SColor(obj->GetColor()),//255, 255, 255, 255),
+			core::rect<s32>(pos.X, pos.Y, pos.X + GRID_LENGTH, pos.Y + GRID_LENGTH));
+	}
+
 	driver_->endScene();
 
 	return 0;
 }
 
-int Scene::UpdateLogic()
+int Scene::UpdateLogic(long long interval)
 {
+	for (auto obj : object_list_)
+	{
+		obj->Update(interval);
+
+		// 移动逻辑
+		{
+			position2di target_posi = obj->GetGridPosition();
+			Direction dir = obj->GetDir();
+			switch (dir)
+			{
+			case Direction::UP:
+				--target_posi.Y;
+				break;
+
+			case Direction::DOWN:
+				++target_posi.Y;
+				break;
+
+			case Direction::LEFT:
+				--target_posi.X;
+				break;
+
+			case Direction::RIGHT:
+				++target_posi.X;
+				break;
+			}
+
+			if (map_data_[target_posi.X][target_posi.Y] == MapDataType::EMPTY)
+				obj->MoveStep();
+		}
+	}
+
 	return 0;
 }
 
 void Scene::CreateMapPureRandom()
 {
 	// 先初始化墙
-	for (int x = 0; x <= SCENE_MAP_WIDTH; ++x)
-		for (int y = 0; y <= SCENE_MAP_HEIGHT; ++y)
+	for (int x = 0; x < SCENE_MAP_WIDTH; ++x)
+		for (int y = 0; y < SCENE_MAP_HEIGHT; ++y)
 			if (0 == x || (SCENE_MAP_WIDTH) == x || 0 == y || (SCENE_MAP_HEIGHT) == y)
 				map_data_[x][y] = MapDataType::BLOCK;
 			else if (x % 2 == 0 || y % 2 == 0)
@@ -149,79 +194,79 @@ void Scene::CreateMapPrim()
 	memset(map_data_, 0, sizeof(map_data_));
 
 	// 先初始化墙
-	for (int x = 0; x <= SCENE_MAP_WIDTH; ++x)
-		for (int y = 0; y <= SCENE_MAP_HEIGHT; ++y)
-			if (0 == x || (SCENE_MAP_WIDTH) == x || 0 == y || (SCENE_MAP_HEIGHT) == y)
+	for (int x = 0; x < SCENE_MAP_WIDTH; ++x)
+		for (int y = 0; y < SCENE_MAP_HEIGHT; ++y)
+			if (0 == x || (SCENE_MAP_WIDTH-1) == x || 0 == y || (SCENE_MAP_HEIGHT-1) == y)
 				map_data_[x][y] = MapDataType::BLOCK;
 			else if (x % 2 == 0 || y % 2 == 0)
 				map_data_[x][y] = MapDataType::BLOCK;
-	
+	/*
 	struct Point
 	{
-		Point(int x = 0, int y = 0) { x_pos = x; y_pos = y; }
-		bool operator <(const Point &other) const { return (x_pos * SHRT_MAX + y_pos) < (other.x_pos * SHRT_MAX + other.y_pos); }
-		int x_pos;
-		int y_pos;
+		Point(int x = 0, int y = 0) { X = x; Y = y; }
+		bool operator <(const Point &other) const { return (X * SHRT_MAX + Y) < (other.X * SHRT_MAX + other.Y); }
+		int X;
+		int Y;
 	};
-
-	std::set<Point> in_path; // 通路列表
-	std::vector<Point> check_wall_list; // 待检查的墙列表
+	*/
+	std::set<position2di> in_path; // 通路列表
+	std::vector<position2di> check_wall_list; // 待检查的墙列表
 	
-	int cur_x_pos = Random::RandomNum(SCENE_MAP_WIDTH/2 - 1) * 2 + 1;
-	int cur_y_pos = Random::RandomNum(SCENE_MAP_HEIGHT/2 - 1) * 2 + 1;
-	in_path.insert(Point(cur_x_pos, cur_y_pos));
+	int cur_X = Random::RandomNum(SCENE_MAP_WIDTH/2 - 1) * 2 + 1;
+	int cur_Y = Random::RandomNum(SCENE_MAP_HEIGHT/2 - 1) * 2 + 1;
+	in_path.insert(position2di(cur_X, cur_Y));
 
 	{
-		Point tmp_p(cur_x_pos - 1, cur_y_pos);
-		if (tmp_p.x_pos > 0 && map_data_[tmp_p.x_pos][tmp_p.y_pos] == MapDataType::BLOCK)
+		position2di tmp_p(cur_X - 1, cur_Y);
+		if (tmp_p.X > 0 && map_data_[tmp_p.X][tmp_p.Y] == MapDataType::BLOCK)
 			check_wall_list.push_back(tmp_p);
 
-		tmp_p.x_pos = cur_x_pos + 1;
-		tmp_p.y_pos = cur_y_pos;
-		if (tmp_p.x_pos < SCENE_MAP_WIDTH - 1 && map_data_[tmp_p.x_pos][tmp_p.y_pos] == MapDataType::BLOCK)
+		tmp_p.X = cur_X + 1;
+		tmp_p.Y = cur_Y;
+		if (tmp_p.X < SCENE_MAP_WIDTH - 1 && map_data_[tmp_p.X][tmp_p.Y] == MapDataType::BLOCK)
 			check_wall_list.push_back(tmp_p);
 
-		tmp_p.x_pos = cur_x_pos;
-		tmp_p.y_pos = cur_y_pos - 1;
-		if (tmp_p.y_pos > 0 && map_data_[tmp_p.x_pos][tmp_p.y_pos] == MapDataType::BLOCK)
+		tmp_p.X = cur_X;
+		tmp_p.Y = cur_Y - 1;
+		if (tmp_p.Y > 0 && map_data_[tmp_p.X][tmp_p.Y] == MapDataType::BLOCK)
 			check_wall_list.push_back(tmp_p);
 
-		tmp_p.x_pos = cur_x_pos;
-		tmp_p.y_pos = cur_y_pos + 1;
-		if (tmp_p.y_pos < SCENE_MAP_HEIGHT - 1 && map_data_[tmp_p.x_pos][tmp_p.y_pos] == MapDataType::BLOCK)
+		tmp_p.X = cur_X;
+		tmp_p.Y = cur_Y + 1;
+		if (tmp_p.Y < SCENE_MAP_HEIGHT - 1 && map_data_[tmp_p.X][tmp_p.Y] == MapDataType::BLOCK)
 			check_wall_list.push_back(tmp_p);
 	}
 
-	Point wall_p;
-	Point p1, p2;
+	position2di wall_p;
+	position2di p1, p2;
 	while (check_wall_list.size() > 0)
 	{
 		// 取出一个并在列表里删除此元素
 		int ran_index = Random::RandomNum(static_cast<int>(check_wall_list.size()));
 		wall_p = check_wall_list[ran_index];
-		for (std::vector<Point>::iterator item_it = check_wall_list.begin(); item_it != check_wall_list.end(); ++item_it)
-			if (item_it->x_pos == wall_p.x_pos && item_it->y_pos == wall_p.y_pos)
+		for (std::vector<position2di>::iterator item_it = check_wall_list.begin(); item_it != check_wall_list.end(); ++item_it)
+			if (item_it->X == wall_p.X && item_it->Y == wall_p.Y)
 			{
 				check_wall_list.erase(item_it);
 				break;
 			}
 
-		if (wall_p.x_pos % 2 == 0) // 左右分割的墙
+		if (wall_p.X % 2 == 0) // 左右分割的墙
 		{
-			p1.x_pos = wall_p.x_pos - 1;
-			p1.y_pos = wall_p.y_pos;
-			p2.x_pos = wall_p.x_pos + 1;
-			p2.y_pos = wall_p.y_pos;
+			p1.X = wall_p.X - 1;
+			p1.Y = wall_p.Y;
+			p2.X = wall_p.X + 1;
+			p2.Y = wall_p.Y;
 		}
 		else // 上下分割的墙
 		{
-			p1.x_pos = wall_p.x_pos;
-			p1.y_pos = wall_p.y_pos - 1;
-			p2.x_pos = wall_p.x_pos;
-			p2.y_pos = wall_p.y_pos + 1;
+			p1.X = wall_p.X;
+			p1.Y = wall_p.Y - 1;
+			p2.X = wall_p.X;
+			p2.Y = wall_p.Y + 1;
 		}
 
-		Point target_pos;
+		position2di target_pos;
 		if (in_path.find(p1) == in_path.end())
 		{
 			in_path.insert(p1);
@@ -234,33 +279,33 @@ void Scene::CreateMapPrim()
 			target_pos = p2;
 		}
 
-		if (target_pos.x_pos > 0 && target_pos.y_pos > 0)
+		if (target_pos.X > 0 && target_pos.Y > 0)
 		{
-			map_data_[wall_p.x_pos][wall_p.y_pos] = MapDataType::EMPTY;
+			map_data_[wall_p.X][wall_p.Y] = MapDataType::EMPTY;
 
-			Point tmp_p(target_pos.x_pos - 1, target_pos.y_pos);
-			if (tmp_p.x_pos > 0 && map_data_[tmp_p.x_pos][tmp_p.y_pos] == MapDataType::BLOCK)
+			position2di tmp_p(target_pos.X - 1, target_pos.Y);
+			if (tmp_p.X > 0 && map_data_[tmp_p.X][tmp_p.Y] == MapDataType::BLOCK)
 			{
 				check_wall_list.push_back(tmp_p);
 			}
 
-			tmp_p.x_pos = target_pos.x_pos + 1;
-			tmp_p.y_pos = target_pos.y_pos;
-			if (tmp_p.x_pos < SCENE_MAP_WIDTH - 1 && map_data_[tmp_p.x_pos][tmp_p.y_pos] == MapDataType::BLOCK)
+			tmp_p.X = target_pos.X + 1;
+			tmp_p.Y = target_pos.Y;
+			if (tmp_p.X < SCENE_MAP_WIDTH - 1 && map_data_[tmp_p.X][tmp_p.Y] == MapDataType::BLOCK)
 			{
 				check_wall_list.push_back(tmp_p);
 			}
 
-			tmp_p.x_pos = target_pos.x_pos;
-			tmp_p.y_pos = target_pos.y_pos - 1;
-			if (tmp_p.y_pos > 0 && map_data_[tmp_p.x_pos][tmp_p.y_pos] == MapDataType::BLOCK)
+			tmp_p.X = target_pos.X;
+			tmp_p.Y = target_pos.Y - 1;
+			if (tmp_p.Y > 0 && map_data_[tmp_p.X][tmp_p.Y] == MapDataType::BLOCK)
 			{
 				check_wall_list.push_back(tmp_p);
 			}
 
-			tmp_p.x_pos = target_pos.x_pos;
-			tmp_p.y_pos = target_pos.y_pos + 1;
-			if (tmp_p.y_pos < SCENE_MAP_HEIGHT - 1 && map_data_[tmp_p.x_pos][tmp_p.y_pos] == MapDataType::BLOCK)
+			tmp_p.X = target_pos.X;
+			tmp_p.Y = target_pos.Y + 1;
+			if (tmp_p.Y < SCENE_MAP_HEIGHT - 1 && map_data_[tmp_p.X][tmp_p.Y] == MapDataType::BLOCK)
 			{
 				check_wall_list.push_back(tmp_p);
 			}
@@ -268,8 +313,13 @@ void Scene::CreateMapPrim()
 	}
 }
 
-void Scene::CreateNewMap()
+void Scene::CreateInitObjs()
 {
-	//this->CreateMapPureRandom();
-	this->CreateMapPrim();
+	SceneObject *obj = SceneObject::CreateObject(this, ObjectType::RUNNER);
+	obj->SetGridPosition(position2di(1, 1));
+	object_list_.push_back(obj);
+
+	obj = SceneObject::CreateObject(this, ObjectType::RUNNER);
+	obj->SetGridPosition(position2di(11, 11));
+	object_list_.push_back(obj);
 }

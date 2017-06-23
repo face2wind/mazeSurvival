@@ -15,6 +15,3 @@ add_executable(maze_survival ${ALL_FILES})
 target_include_directories(maze_survival PUBLIC ${ELEGANCE_SRC_PATH} include/ src/ /usr/X11R6/include)
 
 target_link_libraries(maze_survival libElegance.so libIrrlicht.a)
-
-
-
