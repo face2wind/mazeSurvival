@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.3)
 project(maze_survival)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -ggdb -O0 -pthread -ffast-math -lGLU -lGL -lXxf86vm -lXext -lX11 -lXcursor -Wall -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -ggdb -O0 -pthread -ffast-math -lGL -lXxf86vm -lXext -lX11 -lXcursor -Wall -Werror")
 set(ELEGANCE_SRC_PATH "../../Elegance/src/")
 set(ELEGANCE_LIB_PATH "../../Elegance/build/" "lib/Linux" )
 #set(ELEGANCE_LIB_PATH "../../elegance_build") # for vbox slackware
