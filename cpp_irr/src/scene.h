@@ -1,5 +1,6 @@
 #pragma once
-#include <IrrlichtDevice.h>
+//#include <IrrlichtDevice.h>
+#include <irrlicht.h>
 
 static const int GRID_LENGTH = 5;						// ¸ñ×Ó±ß³¤£¨ÏñËØ£©
 
