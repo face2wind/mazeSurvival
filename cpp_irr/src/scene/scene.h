@@ -2,7 +2,7 @@
 //#include <IrrlichtDevice.h>s
 #include <irrlicht.h>
 #include <list>
-#include "basic_type.h"
+#include "../basic_type.h"
 
 class SceneObject;
 
@@ -19,6 +19,8 @@ public:
 
 	int UpdateView();
 	int UpdateLogic(long long interval);
+
+	void GetMapData(MapDataType map_data_[SCENE_MAP_WIDTH][SCENE_MAP_HEIGHT]);
 
 protected:
 	Scene();

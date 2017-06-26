@@ -37,31 +37,15 @@ void SceneObject::SetGridPosition(position2di posi)
 	pix_posi_.Y = grid_posi_.Y * GRID_LENGTH;
 }
 
-void SceneObject::MoveStep()
+void SceneObject::SetPixPosition(position2di posi)
 {
-	if (Direction::UP == dir_)
-	{
-		--pix_posi_.Y;
-    }
-	else if (Direction::DOWN == dir_)
-    {
-        ++pix_posi_.Y;
-    }
-    else if(Direction::LEFT == dir_)
-    {
-		--pix_posi_.X;
-    }
-    else if (Direction::RIGHT == dir_)
-    {
-        ++pix_posi_.X;
-	}
-
+	pix_posi_ = posi;
 	grid_posi_.X = pix_posi_.X / GRID_LENGTH;
 	grid_posi_.Y = pix_posi_.Y / GRID_LENGTH;
 }
 
 void SceneObject::Update(long long interval)
 {
-	if (interval % 20 == 0)
+	if (interval % GRID_LENGTH == 0)
 		this->Thinking();
 }

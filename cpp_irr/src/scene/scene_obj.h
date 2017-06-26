@@ -38,8 +38,8 @@ public:
 	const position2di & GetPixelPosition() const { return pix_posi_; }
 	const position2di & GetGridPosition() const { return grid_posi_; }
 	void SetGridPosition(position2di posi);
+	void SetPixPosition(position2di posi);
 
-	void MoveStep();
 	void Update(long long interval);
 
 	virtual void Thinking() {}

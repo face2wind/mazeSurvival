@@ -1,4 +1,4 @@
-#include "scene.h"
+#include "scene/scene.h"
 
 #include <irrlicht.h>
 
@@ -39,6 +39,7 @@ public:
 				break;
 			}
 
+			Timer::Sleep(10);
 			++interval;
 			if (interval < 0)
 				interval = 0;

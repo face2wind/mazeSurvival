@@ -4,6 +4,7 @@
 #include <common/random.hpp>
 #include <set>
 #include <vector>
+#include <iostream>
 
 using namespace irr;
 using namespace core;
@@ -52,6 +53,12 @@ int Scene::UpdateView()
 	if (nullptr == device_ || nullptr == driver_) return -1;
 	if (!device_->isWindowActive()) return -2;
 
+	s32 fps = driver_->getFPS();
+	core::stringw str = L"Maze Survival";
+	str += " FPS:";
+	str += fps;
+
+	device_->setWindowCaption(str.c_str());
 	driver_->beginScene(true, true, video::SColor(0xffA8A8A8));// 255, 255, 255, 255));
 
 	// 渲染场景
@@ -82,23 +89,64 @@ int Scene::UpdateLogic(long long interval)
 
 		// 移动逻辑
 		{
-			position2di target_posi = obj->GetGridPosition();
-			Direction dir = obj->GetDir();
-			if (Direction::UP == dir)
-				--target_posi.Y;
-            else if (Direction::DOWN == dir)
-                ++target_posi.Y;
-            else if (Direction::LEFT == dir)
-                --target_posi.X;
-            else if (Direction::RIGHT == dir)
-				++target_posi.X;
+			position2di cur_grid_posi = obj->GetGridPosition();
+			position2di starget_pix_posi = obj->GetPixelPosition();
 
-			if (map_data_[target_posi.X][target_posi.Y] == MapDataType::EMPTY)
-				obj->MoveStep();
+			//（测试当前方向是否移动完毕，比如上下移动的过程中肯定不允许左右移动）
+			bool allow_up_down = false;		// 是否可以上下移动
+			bool allow_left_right = false;	// 是否可以左右移动
+			{
+				if (starget_pix_posi.X == (cur_grid_posi.X * GRID_LENGTH))
+				{
+					allow_up_down = true;
+				}
+				if (starget_pix_posi.Y == (cur_grid_posi.Y * GRID_LENGTH))
+				{
+					allow_left_right = true;
+				}
+			}
+			Direction dir = obj->GetDir();
+			if (allow_up_down)
+			{
+				if (Direction::UP == dir)
+					--starget_pix_posi.Y;
+				else if (Direction::DOWN == dir)
+					++starget_pix_posi.Y;
+			}
+			if (allow_left_right)
+			{
+				if (Direction::LEFT == dir)
+					--starget_pix_posi.X;
+				else if (Direction::RIGHT == dir)
+					++starget_pix_posi.X;
+			}
+
+			position2di target_pos1, target_pos2;
+			target_pos1.X = starget_pix_posi.X;
+			target_pos1.Y = starget_pix_posi.Y;
+			target_pos2.X = target_pos1.X + GRID_LENGTH - 1;
+			target_pos2.Y = target_pos1.Y + GRID_LENGTH - 1;
+
+			target_pos1.X /= GRID_LENGTH;
+			target_pos1.Y /= GRID_LENGTH;
+			target_pos2.X /= GRID_LENGTH;
+			target_pos2.Y /= GRID_LENGTH;
+
+			// 检测目格子四个点所在的格子都可走
+			if (map_data_[target_pos1.X][target_pos1.Y] == MapDataType::EMPTY &&
+				map_data_[target_pos1.X][target_pos2.Y] == MapDataType::EMPTY &&
+				map_data_[target_pos2.X][target_pos1.Y] == MapDataType::EMPTY &&
+				map_data_[target_pos2.X][target_pos2.Y] == MapDataType::EMPTY)
+				obj->SetPixPosition(starget_pix_posi);
 		}
 	}
 
 	return 0;
+}
+
+void Scene::GetMapData(MapDataType other_map_data[SCENE_MAP_WIDTH][SCENE_MAP_HEIGHT])
+{
+	memcpy(other_map_data, map_data_, sizeof(other_map_data));
 }
 
 void Scene::CreateMapPureRandom()
@@ -309,7 +357,7 @@ void Scene::CreateInitObjs()
 	obj->SetGridPosition(position2di(1, 1));
 	object_list_.push_back(obj);
 
-	obj = SceneObject::CreateObject(this, ObjectType::RUNNER);
+/*	obj = SceneObject::CreateObject(this, ObjectType::RUNNER);
 	obj->SetGridPosition(position2di(11, 11));
-	object_list_.push_back(obj);
+	object_list_.push_back(obj);*/
 }
