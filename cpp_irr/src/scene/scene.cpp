@@ -146,7 +146,7 @@ int Scene::UpdateLogic(long long interval)
 
 void Scene::GetMapData(MapDataType other_map_data[SCENE_MAP_WIDTH][SCENE_MAP_HEIGHT])
 {
-	memcpy(other_map_data, map_data_, sizeof(other_map_data));
+	memcpy(other_map_data, map_data_, sizeof(map_data_));
 }
 
 void Scene::CreateMapPureRandom()
