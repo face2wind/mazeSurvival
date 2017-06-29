@@ -12,7 +12,7 @@ using namespace gui;
 #include <elegance.hpp>
 using namespace face2wind;
 
-#include "driverChoice.h"
+//#include "driverChoice.h"
 #ifdef _MSC_VER
 #pragma comment(lib, "Irrlicht.lib")
 #pragma comment(lib, "elegance.lib")
