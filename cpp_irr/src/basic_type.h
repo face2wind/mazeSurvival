@@ -2,8 +2,8 @@
 
 static const int GRID_LENGTH = 5;						// 格子边长（像素）
 
-static const int SCENE_MAP_WIDTH = 255;					// 场景宽度（格子数） 地图格子长度用单数，因为两边是墙
-static const int SCENE_MAP_HEIGHT = 155;					// 场景高度（格子数）
+static const int SCENE_MAP_WIDTH = 301;					// 场景宽度（格子数） 地图格子长度用单数，因为两边是墙
+static const int SCENE_MAP_HEIGHT = 171;				// 场景高度（格子数）
 
 enum class MapDataType
 {

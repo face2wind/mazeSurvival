@@ -51,10 +51,10 @@ public:
 
 int main()
 {
-    video::E_DRIVER_TYPE driverType=driverChoiceConsole();                                                                                                             
-         if (driverType==video::EDT_COUNT)                                                                                                                                  
-                 return 1; 
-	IrrlichtDevice *device = createDevice(driverType, core::dimension2d<u32>(SCENE_MAP_WIDTH*GRID_LENGTH, SCENE_MAP_HEIGHT*GRID_LENGTH));
+    //video::E_DRIVER_TYPE driverType=driverChoiceConsole();                                                                                                             
+      //   if (driverType==video::EDT_COUNT)
+        //         return 1; 
+	IrrlichtDevice *device = createDevice(video::EDT_OPENGL, core::dimension2d<u32>(SCENE_MAP_WIDTH*GRID_LENGTH, SCENE_MAP_HEIGHT*GRID_LENGTH));
 	if (nullptr == device)
 		return 1;
 	device->setWindowCaption(L"Maze Survival");

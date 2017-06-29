@@ -4,33 +4,48 @@
     <Filter Include="src">
       <UniqueIdentifier>{be64886f-48b7-4d21-9b82-2adde91ff60a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\path_finder">
+      <UniqueIdentifier>{a317336b-69e1-4469-b5d6-3d923fa90dfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\scene">
+      <UniqueIdentifier>{7090ff66-29bd-4e6a-bdd7-e1f7ffac1942}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\scene.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="..\src\path_finder\a_star_path_finder.cpp">
+      <Filter>src\path_finder</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\scene_obj.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="..\src\scene\maze_runner.cpp">
+      <Filter>src\scene</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\maze_runner.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="..\src\scene\scene.cpp">
+      <Filter>src\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\scene\scene_obj.cpp">
+      <Filter>src\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\scene.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\scene_obj.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\maze_runner.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\basic_type.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\path_finder\a_star_path_finder.h">
+      <Filter>src\path_finder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\path_finder\i_path_finder.h">
+      <Filter>src\path_finder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scene\maze_runner.h">
+      <Filter>src\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scene\scene.h">
+      <Filter>src\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scene\scene_obj.h">
+      <Filter>src\scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
