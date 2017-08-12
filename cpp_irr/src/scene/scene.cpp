@@ -1,10 +1,9 @@
 #include "scene.h"
 #include "scene_obj.h"
 
-#include <common/random.hpp>
+#include <elegance/common/random.hpp>
 #include <set>
 #include <vector>
-#include <iostream>
 
 using namespace irr;
 using namespace core;

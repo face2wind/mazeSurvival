@@ -1,7 +1,6 @@
 #include "maze_runner.h"
 #include "../basic_type.h"
-#include <common/random.hpp>
-#include <iostream>
+#include <elegance/common/random.hpp>
 #include <vector>
 #include "scene.h"
 

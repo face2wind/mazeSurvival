@@ -9,7 +9,7 @@ using namespace video;
 using namespace io;
 using namespace gui;
 
-#include <elegance.hpp>
+#include "elegance/elegance.hpp"
 using namespace face2wind;
 
 #include "driverChoice.h"
