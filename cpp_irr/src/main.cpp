@@ -1,6 +1,7 @@
 #include "scene/scene.h"
 
 #include <irrlicht.h>
+#include <iostream>
 
 using namespace irr;
 using namespace core;

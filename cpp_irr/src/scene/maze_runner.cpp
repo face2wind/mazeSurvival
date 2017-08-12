@@ -7,6 +7,9 @@
 MazeRunner::MazeRunner(Scene *scene) : SceneObject(scene)
 {
 	scene->GetMapData(view_map_data_);
+
+	path_finder_ = IPathFinder::CreatePathFinder(PathFinderType::Astar);
+	path_finder_->SetMapData(view_map_data_);
 }
 
 MazeRunner::~MazeRunner()
@@ -16,26 +19,29 @@ MazeRunner::~MazeRunner()
 
 void MazeRunner::Thinking()
 {
-	if (pix_posi_.X % GRID_LENGTH == 0 && pix_posi_.Y % GRID_LENGTH == 0)
+	if (pix_posi_.X % GRID_LENGTH == 0 && pix_posi_.Y % GRID_LENGTH == 0) // 当前没有卡在半个格子之间
 	{
-		std::vector<Direction> valid_dir_vec;
-		if (view_map_data_[grid_posi_.X][grid_posi_.Y - 1] == MapDataType::EMPTY)
+		// 随机设定方向
 		{
-			valid_dir_vec.push_back(Direction::UP);
+			std::vector<Direction> valid_dir_vec;
+			if (view_map_data_[grid_posi_.X][grid_posi_.Y - 1] == MapDataType::EMPTY)
+			{
+				valid_dir_vec.push_back(Direction::UP);
+			}
+			if (view_map_data_[grid_posi_.X][grid_posi_.Y + 1] == MapDataType::EMPTY)
+			{
+				valid_dir_vec.push_back(Direction::DOWN);
+			}
+			if (view_map_data_[grid_posi_.X - 1][grid_posi_.Y] == MapDataType::EMPTY)
+			{
+				valid_dir_vec.push_back(Direction::LEFT);
+			}
+			if (view_map_data_[grid_posi_.X + 1][grid_posi_.Y] == MapDataType::EMPTY)
+			{
+				valid_dir_vec.push_back(Direction::RIGHT);
+			}
+			dir_ = valid_dir_vec[face2wind::Random::RandomNum(static_cast<int>(valid_dir_vec.size()))];
+			//std::cout << "pix("<<pix_posi_.X << ","<<pix_posi_.Y<<"), ("<<grid_posi_.X<<", "<<grid_posi_.Y<<") - dir("<<int(dir_)<<")\n";
 		}
-		if (view_map_data_[grid_posi_.X][grid_posi_.Y + 1] == MapDataType::EMPTY)
-		{
-			valid_dir_vec.push_back(Direction::DOWN);
-		}
-		if (view_map_data_[grid_posi_.X - 1][grid_posi_.Y] == MapDataType::EMPTY)
-		{
-			valid_dir_vec.push_back(Direction::LEFT);
-		}
-		if (view_map_data_[grid_posi_.X + 1][grid_posi_.Y] == MapDataType::EMPTY)
-		{
-			valid_dir_vec.push_back(Direction::RIGHT);
-		}
-		dir_ = valid_dir_vec[face2wind::Random::RandomNum(static_cast<int>(valid_dir_vec.size()))];
-		//std::cout << "pix("<<pix_posi_.X << ","<<pix_posi_.Y<<"), ("<<grid_posi_.X<<", "<<grid_posi_.Y<<") - dir("<<int(dir_)<<")\n";
 	}
 }
