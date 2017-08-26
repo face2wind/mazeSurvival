@@ -4,6 +4,8 @@
 
 #include "basic_type.h"
 
+typedef irr::core::position2di Point2d;
+
 enum class PathFinderType
 {
 	Astar = 0,
@@ -16,6 +18,7 @@ enum class PathFinderType
 class IPathFinder
 {
 public:
+
 	IPathFinder() {}
 	virtual ~IPathFinder() {}
 
@@ -33,5 +36,5 @@ public:
 	* @param endPoint
 	* @return 返回寻好的路径点数组，包含所有路径上的点
 	*/
-	virtual std::vector<irr::core::position2di> FindPath(irr::core::position2di start_point, irr::core::position2di end_point) = 0;
+	virtual std::vector<Point2d> FindPath(Point2d start_point, Point2d end_point) = 0;
 };

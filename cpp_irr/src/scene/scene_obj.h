@@ -15,6 +15,12 @@ enum class Direction // 场景物体的方向
 	COUNT
 };
 
+enum class ActionState
+{
+	IDLE = 0,			// 静止状态
+	MOVING,				// 移动状态
+};
+
 enum class ObjectType // 场景对象类型
 {
 	RUNNER = 0,
@@ -31,6 +37,10 @@ public:
 	
 	Direction GetDir() const { return dir_; }
 	void SetDir(Direction dir) { dir_ = dir; }
+	
+	ActionState GetActionState() const { return action_state_; }
+	void SetActionState(ActionState state) { action_state_ = state; }
+
 	ObjectType GetType() const { return type_; }
 	void SetType(ObjectType type) { type_ = type; }
 
@@ -42,12 +52,13 @@ public:
 
 	void Update(long long interval);
 
-	virtual void Thinking() {}
+	virtual void Thinking(long long interval) {}
 
 protected:
 	Scene *scene_;
 
 	Direction dir_;
+	ActionState action_state_;
 	ObjectType type_;
 	unsigned int color_;
 

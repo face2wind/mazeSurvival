@@ -1,8 +1,8 @@
 #include "scene_obj.h"
 #include "scene.h"
-#include "maze_runner.h"
+#include "runner.h"
 
-SceneObject::SceneObject(Scene *scene) : scene_(scene), dir_(Direction::DOWN), type_(ObjectType::RUNNER), color_(0xff0388a0)
+SceneObject::SceneObject(Scene *scene) : scene_(scene), dir_(Direction::DOWN), action_state_(ActionState::IDLE), type_(ObjectType::RUNNER), color_(0xff0388a0)
 {
 }
 
@@ -18,7 +18,7 @@ SceneObject * SceneObject::CreateObject(Scene *scene, ObjectType type)
 	switch (type)
 	{
 	case ObjectType::RUNNER:
-		object = new MazeRunner(scene);
+		object = new Runner(scene);
 		break;
 
 	default:
@@ -47,5 +47,5 @@ void SceneObject::SetPixPosition(position2di posi)
 void SceneObject::Update(long long interval)
 {
 	if (interval % GRID_LENGTH == 0)
-		this->Thinking();
+		this->Thinking(interval);
 }

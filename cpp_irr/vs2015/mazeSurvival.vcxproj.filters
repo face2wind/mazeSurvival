@@ -18,9 +18,6 @@
     <ClCompile Include="..\src\path_finder\a_star_path_finder.cpp">
       <Filter>src\path_finder</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\scene\maze_runner.cpp">
-      <Filter>src\scene</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\scene\scene.cpp">
       <Filter>src\scene</Filter>
     </ClCompile>
@@ -29,6 +26,12 @@
     </ClCompile>
     <ClCompile Include="..\src\path_finder\i_path_finder.cpp">
       <Filter>src\path_finder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\scene\explorer.cpp">
+      <Filter>src\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\scene\runner.cpp">
+      <Filter>src\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -41,13 +44,16 @@
     <ClInclude Include="..\src\path_finder\i_path_finder.h">
       <Filter>src\path_finder</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\scene\maze_runner.h">
-      <Filter>src\scene</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\scene\scene.h">
       <Filter>src\scene</Filter>
     </ClInclude>
     <ClInclude Include="..\src\scene\scene_obj.h">
+      <Filter>src\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scene\explorer.h">
+      <Filter>src\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scene\runner.h">
       <Filter>src\scene</Filter>
     </ClInclude>
   </ItemGroup>

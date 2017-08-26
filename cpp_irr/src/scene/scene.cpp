@@ -87,6 +87,7 @@ int Scene::UpdateLogic(long long interval)
 		obj->Update(interval);
 
 		// ÒÆ¶¯Âß¼­
+		if (ActionState::MOVING == obj->GetActionState())
 		{
 			position2di cur_grid_posi = obj->GetGridPosition();
 			position2di starget_pix_posi = obj->GetPixelPosition();
@@ -146,6 +147,13 @@ int Scene::UpdateLogic(long long interval)
 void Scene::GetMapData(MapDataType other_map_data[SCENE_MAP_WIDTH][SCENE_MAP_HEIGHT])
 {
 	memcpy(other_map_data, map_data_, sizeof(map_data_));
+}
+
+Point2d Scene::GetRandomMovingPoint2d() const
+{
+	int random_x = Random::RandomNum(SCENE_MAP_WIDTH / 2 - 1) * 2 + 1;
+	int random_y = Random::RandomNum(SCENE_MAP_HEIGHT / 2 - 1) * 2 + 1;
+	return Point2d(random_x, random_y);
 }
 
 void Scene::CreateMapPureRandom()
@@ -353,10 +361,10 @@ void Scene::CreateMapPrim()
 void Scene::CreateInitObjs()
 {
 	SceneObject *obj = SceneObject::CreateObject(this, ObjectType::RUNNER);
-	obj->SetGridPosition(position2di(1, 1));
+	obj->SetGridPosition(this->GetRandomMovingPoint2d());
 	object_list_.push_back(obj);
 
-/*	obj = SceneObject::CreateObject(this, ObjectType::RUNNER);
-	obj->SetGridPosition(position2di(11, 11));
-	object_list_.push_back(obj);*/
+	obj = SceneObject::CreateObject(this, ObjectType::RUNNER);
+	obj->SetGridPosition(this->GetRandomMovingPoint2d());
+	object_list_.push_back(obj);
 }

@@ -3,6 +3,7 @@
 #include <irrlicht.h>
 #include <list>
 #include "../basic_type.h"
+#include "path_finder/a_star_path_finder.h"
 
 class SceneObject;
 
@@ -21,6 +22,8 @@ public:
 	int UpdateLogic(long long interval);
 
 	void GetMapData(MapDataType map_data_[SCENE_MAP_WIDTH][SCENE_MAP_HEIGHT]);
+
+	Point2d GetRandomMovingPoint2d() const;
 
 protected:
 	Scene();
