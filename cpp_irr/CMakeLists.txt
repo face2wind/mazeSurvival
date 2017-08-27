@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.7)
 project(maze_survival)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -ggdb -O0 -pthread -Wall -Werror -lElegance -lIrrlicht")# -lGL -lXxf86vm -lXext -lX11 -lXcursor")
-set(ELEGANCE_SRC_PATH "../../Elegance/src/")
-set(ELEGANCE_LIB_PATH "../../Elegance/build/" "lib/Linux/" )
+set(ELEGANCE_SRC_PATH "../../Elegance/")
+set(ELEGANCE_LIB_PATH "../../Elegance/lib/linux64/" "lib/Linux/" )
 
 file(GLOB_RECURSE ALL_FILES src/*.cpp)
 

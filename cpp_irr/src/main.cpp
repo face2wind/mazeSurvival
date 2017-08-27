@@ -40,7 +40,7 @@ public:
 				break;
 			}
 
-			Timer::Sleep(20);
+			Timer::Sleep(10);
 			++interval;
 			if (interval < 0)
 				interval = 0;
