@@ -1,5 +1,9 @@
 #pragma once
+
 #include <position2d.h>
+#include <basic_type.h>
+#include "path_finder/a_star_path_finder.h"
+#include "scene_view.h"
 
 using irr::core::position2di;
 
@@ -33,8 +37,14 @@ public:
 	SceneObject(Scene *scene);
 	virtual ~SceneObject();
 
+	void SetID(int new_obj_id);
+	ObjectID GetID() const { return object_id_; }
+
 	static SceneObject * CreateObject(Scene *scene, ObjectType type);
 	
+	SceneView *GetSceneView() { return &scene_view_; }
+	void UpdateSceneViewSelfObject();
+
 	Direction GetDir() const { return dir_; }
 	void SetDir(Direction dir) { dir_ = dir; }
 	
@@ -57,11 +67,15 @@ public:
 protected:
 	Scene *scene_;
 
+	SceneView scene_view_;
+
+	ObjectID object_id_;
+
 	Direction dir_;
 	ActionState action_state_;
 	ObjectType type_;
 	unsigned int color_;
 
-	position2di pix_posi_;
-	position2di grid_posi_;
+	Point2d pix_posi_;
+	Point2d grid_posi_;
 };

@@ -23,7 +23,6 @@ void AStarPathFinder::SetMapData(MapDataType map_data[SCENE_MAP_WIDTH][SCENE_MAP
 
 std::vector<Point2d> AStarPathFinder::FindPath(Point2d start_point, Point2d end_point)
 {
-	std::vector<Point2d> path;
 	AStarPoint *end_apoint = nullptr;
 
 	do
@@ -33,7 +32,7 @@ std::vector<Point2d> AStarPathFinder::FindPath(Point2d start_point, Point2d end_
 			break;
 		}
 
-		if (MapDataType::EMPTY != map_data_[start_point.X][start_point.Y].mapType || MapDataType::EMPTY != map_data_[end_point.X][end_point.Y].mapType)
+		if (!MapDataCanMove(map_data_[start_point.X][start_point.Y].mapType) || !MapDataCanMove(map_data_[end_point.X][end_point.Y].mapType))
 		{
 			break;
 		}
@@ -88,6 +87,7 @@ std::vector<Point2d> AStarPathFinder::FindPath(Point2d start_point, Point2d end_
 
 	} while (false);
 
+	std::vector<Point2d> path;
 	AStarPoint *cur_apoint = end_apoint;	// 从终点往回遍历指针，记录路线
 	while (nullptr != cur_apoint)
 	{
@@ -95,8 +95,13 @@ std::vector<Point2d> AStarPathFinder::FindPath(Point2d start_point, Point2d end_
 		cur_apoint = cur_apoint->prePoint;
 	}
 
-	if (path.back() != start_point) // 找到的路线的终点并不是起点，清空路线
-		path.clear();
+	if (!path.empty())
+	{
+		if (path.back() != start_point) // 找到的路线的终点并不是起点，清空路线
+			path.clear();
+		else
+			path.pop_back();			// 把起点删除
+	}
 
 	return path;
 }
@@ -104,37 +109,39 @@ std::vector<Point2d> AStarPathFinder::FindPath(Point2d start_point, Point2d end_
 std::vector<AStarPathFinder::AStarPoint*> AStarPathFinder::GetSurroundingPoint(const AStarPoint &curPoint)
 {
 	std::vector<AStarPathFinder::AStarPoint*> surround_point_list;
-	
-	if (0 < curPoint.x  && (MapDataType::EMPTY == map_data_[curPoint.x - 1][curPoint.y].mapType)) // 左
+	static const int VALID_SCENE_MAP_WIDTH = SCENE_MAP_WIDTH - 1;
+	static const int VALID_SCENE_MAP_HEIGHT = SCENE_MAP_HEIGHT - 1;
+
+	if (0 < curPoint.x  && MapDataCanMove(map_data_[curPoint.x - 1][curPoint.y].mapType)) // 左
 		surround_point_list.push_back(&map_data_[curPoint.x - 1][curPoint.y]);
-	if (SCENE_MAP_WIDTH > curPoint.x && (MapDataType::EMPTY == map_data_[curPoint.x + 1][curPoint.y].mapType)) // 右
+	if ((VALID_SCENE_MAP_WIDTH - 1) > curPoint.x && MapDataCanMove(map_data_[curPoint.x + 1][curPoint.y].mapType)) // 右
 		surround_point_list.push_back(&map_data_[curPoint.x + 1][curPoint.y]);
-	if (0 < curPoint.y && (MapDataType::EMPTY == map_data_[curPoint.x][curPoint.y - 1].mapType)) // 上
+	if (0 < curPoint.y && MapDataCanMove(map_data_[curPoint.x][curPoint.y - 1].mapType)) // 上
 		surround_point_list.push_back(&map_data_[curPoint.x][curPoint.y - 1]);
-	if (SCENE_MAP_HEIGHT > curPoint.y && (MapDataType::EMPTY == map_data_[curPoint.x][curPoint.y + 1].mapType)) // 下
+	if (VALID_SCENE_MAP_HEIGHT > curPoint.y && MapDataCanMove(map_data_[curPoint.x][curPoint.y + 1].mapType)) // 下
 		surround_point_list.push_back(&map_data_[curPoint.x][curPoint.y + 1]);
 
 	if (!is_direction8_)
 		return surround_point_list;
 
 	if (0 < curPoint.x && 0 < curPoint.y &&
-		(MapDataType::EMPTY == map_data_[curPoint.x - 1][curPoint.y - 1].mapType) && // 左上
-		(MapDataType::EMPTY == map_data_[curPoint.x - 1][curPoint.y].mapType && !(MapDataType::EMPTY == map_data_[curPoint.x][curPoint.y - 1].mapType))) // 没有被两边夹住
+		MapDataCanMove(map_data_[curPoint.x - 1][curPoint.y - 1].mapType) && // 左上
+		(MapDataCanMove(map_data_[curPoint.x - 1][curPoint.y].mapType) && !MapDataCanMove(map_data_[curPoint.x][curPoint.y - 1].mapType))) // 没有被两边夹住
 		surround_point_list.push_back(&map_data_[curPoint.x - 1][curPoint.y - 1]);
 
-	if (SCENE_MAP_WIDTH > curPoint.x && 0 < curPoint.y &&
-		(MapDataType::EMPTY == map_data_[curPoint.x + 1][curPoint.y - 1].mapType) && // 右上
-		(MapDataType::EMPTY == map_data_[curPoint.x][curPoint.y - 1].mapType && !(MapDataType::EMPTY == map_data_[curPoint.x + 1][curPoint.y].mapType))) // 没有被两边夹住
+	if (VALID_SCENE_MAP_WIDTH > curPoint.x && 0 < curPoint.y &&
+		MapDataCanMove(map_data_[curPoint.x + 1][curPoint.y - 1].mapType) && // 右上
+		(MapDataCanMove(map_data_[curPoint.x][curPoint.y - 1].mapType) && !MapDataCanMove(map_data_[curPoint.x + 1][curPoint.y].mapType))) // 没有被两边夹住
 		surround_point_list.push_back(&map_data_[curPoint.x + 1][curPoint.y - 1]);
 
-	if (SCENE_MAP_WIDTH > curPoint.x && SCENE_MAP_HEIGHT > curPoint.y &&
-		(MapDataType::EMPTY == map_data_[curPoint.x + 1][curPoint.y + 1].mapType) && // 右下
-		(MapDataType::EMPTY == map_data_[curPoint.x][curPoint.y + 1].mapType && !(MapDataType::EMPTY == map_data_[curPoint.x + 1][curPoint.y].mapType))) // 没有被两边夹住
+	if (VALID_SCENE_MAP_WIDTH > curPoint.x && VALID_SCENE_MAP_HEIGHT > curPoint.y &&
+		MapDataCanMove(map_data_[curPoint.x + 1][curPoint.y + 1].mapType) && // 右下
+		(MapDataCanMove(map_data_[curPoint.x][curPoint.y + 1].mapType) && !MapDataCanMove(map_data_[curPoint.x + 1][curPoint.y].mapType))) // 没有被两边夹住
 		surround_point_list.push_back(&map_data_[curPoint.x + 1][curPoint.y + 1]);
 
-	if (0 < curPoint.x && SCENE_MAP_HEIGHT > curPoint.y &&
-		(MapDataType::EMPTY == map_data_[curPoint.x - 1][curPoint.y + 1].mapType) && // 左下
-		(MapDataType::EMPTY == map_data_[curPoint.x][curPoint.y + 1].mapType && !(MapDataType::EMPTY == map_data_[curPoint.x - 1][curPoint.y].mapType))) // 没有被两边夹住
+	if (0 < curPoint.x && VALID_SCENE_MAP_HEIGHT > curPoint.y &&
+		MapDataCanMove(map_data_[curPoint.x - 1][curPoint.y + 1].mapType) && // 左下
+		(MapDataCanMove(map_data_[curPoint.x][curPoint.y + 1].mapType) && !MapDataCanMove(map_data_[curPoint.x - 1][curPoint.y].mapType))) // 没有被两边夹住
 		surround_point_list.push_back(&map_data_[curPoint.x - 1][curPoint.y + 1]);
 
 	return surround_point_list;

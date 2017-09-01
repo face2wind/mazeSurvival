@@ -5,10 +5,7 @@
 
 Runner::Runner(Scene *scene) : Explorer(scene)
 {
-	scene->GetMapData(view_map_data_);
-
-	path_finder_ = IPathFinder::CreatePathFinder(PathFinderType::Astar);
-	path_finder_->SetMapData(view_map_data_);
+	this->StartExplore();
 }
 
 Runner::~Runner()

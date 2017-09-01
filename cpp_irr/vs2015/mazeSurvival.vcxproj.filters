@@ -33,6 +33,9 @@
     <ClCompile Include="..\src\scene\runner.cpp">
       <Filter>src\scene</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\scene\scene_view.cpp">
+      <Filter>src\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\basic_type.h">
@@ -54,6 +57,9 @@
       <Filter>src\scene</Filter>
     </ClInclude>
     <ClInclude Include="..\src\scene\runner.h">
+      <Filter>src\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scene\scene_view.h">
       <Filter>src\scene</Filter>
     </ClInclude>
   </ItemGroup>
